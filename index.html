@@ -466,6 +466,17 @@ class Chart{
       }
       return (best && bd<46) ? best.label : null;
     }
+    if(mode==='regions'){
+      if(!this.regions) return null;
+      let best=null,bd=1e9;
+      for(const k in this.regions){
+        const r=this.regions[k];
+        const yc = r.type==='zone' ? (this.yOf(r.priceHigh)+this.yOf(r.priceLow))/2 : this.yOf(r.price);
+        const d=Math.abs(py-yc);
+        if(d<bd){bd=d;best=k;}
+      }
+      return bd<44 ? best : null;
+    }
     // candle-based modes: find nearest candle by x
     let i=Math.round((px-this.plotL-this.cw/2)/this.cw);
     i=Math.max(0,Math.min(this.candles.length-1,i));
@@ -602,6 +613,8 @@ const TRACKS=[
        lead:'A floor where buyers keep stepping in.',
        body:`<p><b>Support</b> is a price level where falling prices tend to stop and bounce. Buyers see value there and step in, overpowering sellers.</p>
        <p>The more times price touches a level and bounces, the more <b>significant</b> that level becomes — more traders are watching it.</p>`,
+       terms:[['Support','the floor buyers defend']],
+       keys:['support'], interactive:'regions',
        chart:'support',
        cap:'Price bounces off the same support level three times.',
        concept:{t:'Key idea',body:'Support isn\'t a single exact price — think of it as a zone. Price can briefly pierce it (a wick) and still hold.'}
@@ -610,6 +623,8 @@ const TRACKS=[
        lead:'A ceiling where sellers keep stepping in.',
        body:`<p><b>Resistance</b> is the opposite — a price ceiling where rising prices tend to stall and reverse. Sellers see the level as expensive and offload.</p>
        <p>When price finally <b>breaks through</b> resistance with strength, that old resistance often becomes new support. This flip is one of the most important concepts in charting.</p>`,
+       terms:[['Resistance','the ceiling sellers defend']],
+       keys:['resistance'], interactive:'regions',
        chart:'resistance',
        cap:'Resistance rejects price twice, then breaks. Old resistance becomes support.',
        concept:{t:'The flip',body:'Broken resistance → support. Broken support → resistance. Levels don\'t disappear, they switch roles.'}
@@ -668,9 +683,10 @@ const TRACKS=[
     steps:[
       {type:'lesson', title:'The Four Swing Labels',
        lead:'Every trend is spelled out in four letters.',
-       body:`<p>Traders label each swing point so structure is unambiguous:</p>`,
-       terms:[['HH','Higher High'],['HL','Higher Low'],['LH','Lower High'],['LL','Lower Low']],
-       afterTerms:`<p>An <b>uptrend</b> = HH + HL repeating. A <b>downtrend</b> = LH + LL repeating. When the pattern breaks, structure is shifting.</p>`,
+       body:`<p>Traders label each swing point so structure is unambiguous. This chart is an <b>uptrend</b> — tap its two labels to see them light up:</p>`,
+       terms:[['HH','Higher High'],['HL','Higher Low']],
+       keys:['HH','HL'], interactive:'structure',
+       afterTerms:`<p>The bearish mirror images are <b>LH</b> (Lower High) and <b>LL</b> (Lower Low). An <b>uptrend</b> = HH + HL repeating. A <b>downtrend</b> = LH + LL repeating. When the pattern breaks, structure is shifting.</p>`,
        chart:'structure-labels',
        cap:'An uptrend labeled: HL → HH → HL → HH. Price makes higher highs and higher lows.',
        concept:{t:'Key idea',body:'Structure tells you the trend objectively. You don\'t guess — you read the sequence of HH/HL or LH/LL.'}
@@ -903,6 +919,8 @@ const TRACKS=[
        lead:'The last candle before the move.',
        body:`<p>An <b>order block</b> is the last opposite-colored candle before a strong, decisive move. A <b>bullish order block</b> is the last DOWN candle before a big rally — it marks where institutions loaded up.</p>
        <p>When price returns to that candle's zone later, it often reacts there — making the order block a precise entry area.</p>`,
+       terms:[['Order block','last down candle before the rally']],
+       keys:['orderblock'], interactive:'regions',
        chart:'ob-what',
        cap:'The last down candle before the rally = the bullish order block.',
        concept:{t:'Why it matters',body:'Institutions leave footprints. The order block is where their unfilled orders likely still rest.'}
@@ -1225,6 +1243,7 @@ function buildChart(canvas, id){
       candles=candlesThroughPivots([100,88,99,87.5,101,88.5,104],7,7);
       const ch=new Chart(canvas,candles,{height:300,padR:56});
       ch.overlays=[{type:'hline',price:87.7,color:'#26A69A',label:'SUPPORT',width:2}];
+      ch.regions={support:{type:'hline',price:87.7,color:'#26A69A',label:'SUPPORT — the floor buyers defend'}};
       ch.draw(); return ch;
     }
     case 'resistance':{
@@ -1233,6 +1252,7 @@ function buildChart(canvas, id){
       ch.overlays=[
         {type:'hline',price:101.5,color:'#EF5350',label:'RESISTANCE → becomes support',width:2},
       ];
+      ch.regions={resistance:{type:'hline',price:101.5,color:'#EF5350',label:'RESISTANCE — the ceiling sellers defend'}};
       ch.draw(); return ch;
     }
     case 'trends':{
@@ -1463,6 +1483,7 @@ function buildChart(canvas, id){
         {type:'zone',priceHigh:98,priceLow:96.3,color:'rgba(155,123,240,.2)'},
         {type:'label',text:'order block',i:1,price:93.5,color:'#9B7BF0'},
       ];
+      ch.regions={orderblock:{type:'zone',priceHigh:98,priceLow:96.3,color:'#9B7BF0',label:'ORDER BLOCK — last down candle before the rally'}};
       ch.draw(); return ch;
     }
     case 'ob-fvg':{
@@ -1762,9 +1783,9 @@ function setHighlight(key){
 function lessonHTML(t,step){
   let terms='';
   const keyMap={anatomy:['body','wick','green','red'],wicks:['upper','lower'],structure:['HH','HL','LH','LL']};
-  if(step.terms && keyMap[step.interactive]){
-    const keys=keyMap[step.interactive];
-    terms=`<div class="term-row">${step.terms.map(([a,b],i)=>`<button class="term term-btn" data-anat="${keys[i]}" onclick="anatomyClick('${keys[i]}',this)"><b>${a}</b> — ${b}</button>`).join('')}</div><div class="anatomy-hint">👆 Tap each part to light it up on the chart below</div>`;
+  const keys = step.keys || keyMap[step.interactive];
+  if(step.terms && step.interactive && keys){
+    terms=`<div class="term-row">${step.terms.map(([a,b],i)=>`<button class="term term-btn" data-anat="${keys[i]}" onclick="anatomyClick('${keys[i]}',this)"><b>${a}</b> — ${b}</button>`).join('')}</div><div class="anatomy-hint">👆 Tap to light it up on the chart below</div>`;
   } else if(step.terms){
     terms=`<div class="term-row">${step.terms.map(([a,b])=>`<div class="term"><b>${a}</b> — ${b}</div>`).join('')}</div>`;
   }
