@@ -446,9 +446,8 @@ class Chart{
         c.lineWidth=3.2; c.beginPath(); c.moveTo(x-7,this.yOf(cd.low)); c.lineTo(x+7,this.yOf(cd.low)); c.stroke(); }
       c.restore();
     };
-    const structureKeys=['HH','HL','LH','LL'];
-    if(structureKeys.includes(h)){
-      // re-draw the candles at full opacity, then ring the matching pivots
+    // helper: redraw all candles at full opacity (so they sit above the dim)
+    const redrawCandles=()=>{
       for(let i=0;i<this.candles.length;i++){
         const cd=this.candles[i], x=this.xOf(i), up=cd.close>=cd.open, col=up?'#26A69A':'#EF5350';
         c.strokeStyle=col; c.fillStyle=col; c.lineWidth=1.4;
@@ -456,6 +455,31 @@ class Chart{
         const yO=this.yOf(cd.open), yC=this.yOf(cd.close);
         c.fillRect(x-bodyW/2, Math.min(yO,yC), bodyW, Math.max(2,Math.abs(yC-yO)));
       }
+    };
+    // named region highlight (support/resistance line, order-block zone, etc.)
+    if(this.regions && this.regions[h]){
+      const r=this.regions[h];
+      redrawCandles();
+      c.save(); c.shadowColor=r.color; c.shadowBlur=18;
+      if(r.type==='zone'){
+        const y1=this.yOf(r.priceHigh), y2=this.yOf(r.priceLow);
+        c.fillStyle=r.color+'44';
+        c.fillRect(this.plotL,Math.min(y1,y2),this.plotW,Math.abs(y2-y1));
+        c.strokeStyle=r.color; c.lineWidth=2.5; c.strokeRect(this.plotL,Math.min(y1,y2),this.plotW,Math.abs(y2-y1));
+      } else {
+        const y=this.yOf(r.price);
+        c.strokeStyle=r.color; c.lineWidth=3.5; c.lineCap='round';
+        c.beginPath(); c.moveTo(this.plotL,y); c.lineTo(this.plotR,y); c.stroke();
+      }
+      c.restore();
+      c.save(); c.fillStyle=r.color; c.font='bold 12px Inter'; c.textAlign='center';
+      c.fillText(r.label, this.w/2, this.plotT+4); c.restore();
+      return;
+    }
+    const structureKeys=['HH','HL','LH','LL'];
+    if(structureKeys.includes(h)){
+      // re-draw the candles at full opacity, then ring the matching pivots
+      redrawCandles();
       for(const o of this.overlays){
         if(o.type!=='pivot' || o.label!==h) continue;
         const x=this.xOf(o.i), y=this.yOf(o.price);
