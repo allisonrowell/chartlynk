@@ -138,6 +138,11 @@ body{
 
 .term-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
 .term{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:.82rem}
+.term-btn{font-family:'Inter',sans-serif;color:var(--text);cursor:pointer;transition:border-color .12s,background .12s,transform .1s;text-align:left}
+.term-btn:hover{border-color:rgba(91,141,239,.5);background:#222c42;transform:translateY(-1px)}
+.term-btn.active{border-color:var(--accent);background:rgba(91,141,239,.18);box-shadow:0 0 0 1px var(--accent)}
+.term-btn b{color:var(--accent)}
+.anatomy-hint{font-size:.78rem;color:var(--dim);margin:-4px 0 6px}
 .term b{color:var(--accent)}
 
 .chart-cap{font-size:.8rem;color:var(--dim);text-align:center;margin-top:8px;font-style:italic}
@@ -368,6 +373,51 @@ class Chart{
     // user drawings
     for(const l of this.userLines) this._drawUserLine(l);
     for(const m of this.userMarks) this._drawUserMark(m);
+    // interactive anatomy spotlight
+    if(this.highlight) this._spotlight();
+  }
+
+  _spotlight(){
+    const c=this.ctx, h=this.highlight;
+    // dim everything so the highlighted part pops
+    c.save();
+    c.fillStyle='rgba(8,11,18,.66)';
+    c.fillRect(0,0,this.w,this.h);
+    c.restore();
+    const bodyW=Math.max(2,Math.min(this.cw*0.62,16));
+    const drawWick=(cd,x,col)=>{
+      c.save();
+      c.shadowColor=col; c.shadowBlur=16;
+      c.strokeStyle=col; c.lineWidth=2.6; c.lineCap='round';
+      c.beginPath(); c.moveTo(x,this.yOf(cd.high)); c.lineTo(x,this.yOf(cd.low)); c.stroke();
+      c.lineWidth=3.2;
+      c.beginPath(); c.moveTo(x-7,this.yOf(cd.high)); c.lineTo(x+7,this.yOf(cd.high)); c.stroke();
+      c.beginPath(); c.moveTo(x-7,this.yOf(cd.low)); c.lineTo(x+7,this.yOf(cd.low)); c.stroke();
+      c.restore();
+    };
+    const drawBody=(cd,x,col)=>{
+      const yO=this.yOf(cd.open), yC=this.yOf(cd.close);
+      const top=Math.min(yO,yC), bh=Math.max(2,Math.abs(yC-yO));
+      c.save();
+      c.shadowColor=col; c.shadowBlur=20;
+      c.fillStyle=col; c.fillRect(x-bodyW/2, top, bodyW, bh);
+      c.lineWidth=2; c.strokeStyle='#fff'; c.strokeRect(x-bodyW/2, top, bodyW, bh);
+      c.restore();
+    };
+    for(let i=0;i<this.candles.length;i++){
+      const cd=this.candles[i], x=this.xOf(i);
+      const up=cd.close>=cd.open, col=up?'#26A69A':'#EF5350';
+      if(h==='body') drawBody(cd,x,col);
+      else if(h==='wick') drawWick(cd,x,'#F5B82E');
+      else if(h==='green' && up){ drawWick(cd,x,'#26A69A'); drawBody(cd,x,'#26A69A'); }
+      else if(h==='red' && !up){ drawWick(cd,x,'#EF5350'); drawBody(cd,x,'#EF5350'); }
+    }
+    const labels={body:'BODY — the open-to-close range',wick:'WICK / SHADOW — the high & low extremes',green:'GREEN — close above open (bullish)',red:'RED — close below open (bearish)'};
+    const cols={body:'#fff',wick:'#F5B82E',green:'#4DD0C4',red:'#FF7B78'};
+    c.save();
+    c.fillStyle=cols[h]||'#fff'; c.font='bold 12px Inter'; c.textAlign='center';
+    c.fillText(labels[h]||'', this.w/2, this.plotT+4);
+    c.restore();
   }
   _drawZone(o){
     const c=this.ctx;
@@ -448,6 +498,7 @@ const TRACKS=[
        body:`<p>A single candlestick shows the battle between buyers and sellers over one period of time — a minute, an hour, a day, whatever timeframe you choose.</p>
        <p>It encodes <b>four prices</b>: where price <b>opened</b>, the <b>high</b>, the <b>low</b>, and where it <b>closed</b>.</p>`,
        terms:[['Body','open → close range'],['Wick / shadow','the high & low extremes'],['Green','close above open (bullish)'],['Red','close below open (bearish)']],
+       interactive:'anatomy',
        chart:'candle-anatomy',
        cap:'A green (bullish) candle vs a red (bearish) candle.',
        concept:{t:'Key idea',body:'A big body = strong conviction. Long wicks = rejection — price tried to go there and got pushed back.'}
@@ -1609,7 +1660,13 @@ function renderStep(){
 }
 
 function lessonHTML(t,step){
-  const terms=step.terms?`<div class="term-row">${step.terms.map(([a,b])=>`<div class="term"><b>${a}</b> — ${b}</div>`).join('')}</div>`:'';
+  let terms='';
+  if(step.terms && step.interactive==='anatomy'){
+    const keys=['body','wick','green','red'];
+    terms=`<div class="term-row">${step.terms.map(([a,b],i)=>`<button class="term term-btn" data-anat="${keys[i]}" onclick="anatomyClick('${keys[i]}',this)"><b>${a}</b> — ${b}</button>`).join('')}</div><div class="anatomy-hint">👆 Tap each part to light it up on the chart below</div>`;
+  } else if(step.terms){
+    terms=`<div class="term-row">${step.terms.map(([a,b])=>`<div class="term"><b>${a}</b> — ${b}</div>`).join('')}</div>`;
+  }
   const after=step.afterTerms||'';
   const concept=step.concept?`<div class="concept ${step.concept.warn?'warn':''}"><div class="ct">${step.concept.t}</div>${step.concept.body}</div>`:'';
   const chart=step.chart?`<div class="chart-shell"><canvas id="chart"></canvas></div>${step.cap?`<div class="chart-cap">${step.cap}</div>`:''}`:'';
@@ -1625,6 +1682,15 @@ function lessonHTML(t,step){
       <button class="btn btn-primary btn-block" onclick="nextStep()">Continue →</button>
     </div>
   </div>`;
+}
+
+function anatomyClick(key, btn){
+  const ch=view.activeChart; if(!ch) return;
+  const wasActive = ch.highlight===key;
+  ch.highlight = wasActive ? null : key;
+  ch.draw();
+  document.querySelectorAll('.term-btn').forEach(b=>b.classList.remove('active'));
+  if(!wasActive) btn.classList.add('active');
 }
 
 function quizHTML(t,step){
