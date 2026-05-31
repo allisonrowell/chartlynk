@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChartLab — Learn to Read Charts</title>
+<title>ChartLYNK — Read Market Structure</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -577,42 +577,482 @@ const TRACKS=[
   },
   {
     id:'icc', num:'5', icon:'🎯', color:'#EF5350',
-    name:'ICC Fundamentals',
-    desc:'Institutional Candle Concept: where smart money enters.',
+    name:'ICC: Indication · Correction · Continuation',
+    desc:'The price-action sequence: a move shows intent, pulls back, then continues.',
     steps:[
-      {type:'lesson', title:'What is ICC?',
-       lead:'Institutional Candle Concept — reading the footprints of big money.',
-       body:`<p><b>ICC (Institutional Candle Concept)</b> is the idea that large institutions can't enter positions all at once without moving the market. They accumulate quietly, then a decisive <b>institutional candle</b> reveals their hand.</p>
-       <p>The framework looks for: a <b>liquidity grab</b> (price sweeps a high/low to trigger stops), followed by a strong <b>displacement candle</b> back in the opposite direction — the institutional footprint.</p>`,
-       chart:'icc-overview',
-       cap:'A liquidity sweep below support, then a large institutional candle displacing upward.',
-       concept:{t:'Core sequence',body:'Liquidity grab → displacement → return to the candle\'s origin (the entry zone). That return is often the trade.'}
+      {type:'lesson', title:'1 — Indication',
+       lead:'The market shows its hand.',
+       body:`<p><b>Indication</b> is the first decisive move that signals intent — a strong impulse or a <b>break of structure</b> that tells you which way momentum wants to go. A burst of large-bodied candles breaking a prior high is bullish indication.</p>
+       <p>It answers one question: <b>which direction is in control right now?</b> Everything that follows keys off this first clue.</p>`,
+       chart:'icc-indication',
+       cap:'A strong impulse breaks the prior high — bullish indication.',
+       concept:{t:'Read it',body:'Big bodies and a clean break of a level = real indication. Small, overlapping candles = no clear intent yet, so wait.'}
       },
-      {type:'lesson', title:'The Liquidity Grab',
-       lead:'Stops get hunted before the real move.',
-       body:`<p>Below obvious support sit a cluster of stop-loss orders. Institutions push price just below it — a <b>sweep</b> — triggering those stops and grabbing cheap liquidity (the shares/contracts they need).</p>
-       <p>This shows up as a candle with a long wick piercing the level, then snapping back. The retail traders who got stopped out are the fuel for the next move.</p>`,
-       chart:'icc-sweep',
-       cap:'Price wicks below support (the grab), then reverses sharply upward.',
-       concept:{t:'Tell',body:'A fast wick through a level that immediately reverses is a classic liquidity grab — not a real breakdown.'}
+      {type:'lesson', title:'2 — Correction',
+       lead:'Price pulls back before it continues.',
+       body:`<p>After the indication, price rarely runs in a straight line — it <b>corrects</b>: a pullback against the move. This is the market catching its breath, usually retracing into a level (a prior structure point, the 50–61.8% zone, or a demand area).</p>
+       <p>The correction is your <b>preparation phase</b>. You don't chase the impulse — you wait for the pullback to bring price back to you at a better level.</p>`,
+       chart:'icc-correction',
+       cap:'After the impulse, price corrects back into a pullback zone.',
+       concept:{t:'Patience',body:'A healthy correction is shallow and orderly. A deep, violent retrace that breaks the prior structure means the indication may have failed.'}
       },
-      {type:'lesson', title:'Displacement & The Entry',
-       lead:'The decisive candle marks the zone.',
-       body:`<p>After the grab, a large, fast <b>displacement candle</b> shoots in the new direction. The base of that candle (its open, or the order block before it) becomes the <b>institutional zone</b>.</p>
-       <p>Traders wait for price to <b>return</b> to that zone — a pullback — and enter in the direction of the displacement, with a stop just beyond the swept level.</p>`,
-       chart:'icc-entry',
-       cap:'Displacement candle up → pullback into the zone → continuation. Stop sits below the grab.',
-       concept:{t:'Risk',body:'The swept low gives you a precise invalidation: if price closes back below it, the idea is wrong. Tight, defined risk.'}
+      {type:'lesson', title:'3 — Continuation',
+       lead:'The move resumes — and that\'s your trade.',
+       body:`<p><b>Continuation</b> is when price resumes in the direction of the original indication, leaving the correction behind. You enter <b>during the correction</b> (ideally with a confirmation candle), positioning for the continuation.</p>
+       <p>Your stop sits just beyond the correction's extreme: if price keeps going against you and breaks that point, the continuation idea is invalid. Clean, pre-defined risk.</p>`,
+       chart:'icc-continuation',
+       cap:'Indication → correction → continuation. Enter in the pullback, stop beyond it, target the new high.',
+       concept:{t:'The whole sequence',body:'Indication tells you the direction. Correction gives you the entry. Continuation pays you. I → C → C.'}
       },
-      {type:'quiz', q:'In ICC, what is the purpose of a "liquidity grab" below support?',
-       opts:['To confirm a real breakdown','To trigger stops and absorb orders before reversing','To draw a trendline','To create a doji'],
+      {type:'quiz', q:'What is the correct ICC sequence?',
+       opts:['Correction → Indication → Continuation','Indication → Correction → Continuation','Continuation → Correction → Indication','Indication → Continuation → Correction'],
        answer:1,
-       exp:'The grab sweeps stop-losses below support, giving institutions the liquidity (and cheap fills) they need before driving price the other way.'
+       exp:'ICC = Indication (intent shown) → Correction (pullback) → Continuation (the move resumes). Order matters.'
       },
-      {type:'practice', title:'Mark the ICC Setup',
-       task:'Find the institutional setup. Use "Grab" to mark the liquidity sweep (the wick low), then "Zone" to mark the displacement candle\'s entry level.',
-       chart:'practice-icc', tool:'icc', checkType:'iccSetup',
-       hint:'The sweep is the lowest wick that pierces support then reverses. The zone is the base of the big candle that shot up after.'
+      {type:'quiz', q:'In an ICC setup, when do you look to enter?',
+       opts:['During the indication impulse','During the correction, in the indication\'s direction','After the continuation is finished','Only at the very high'],
+       answer:1,
+       exp:'You enter during the correction — the pullback — positioning for the continuation in the direction the indication showed.'
+      },
+      {type:'practice', title:'Mark the Correction Zone',
+       task:'The chart shows a bullish indication (impulse up) followed by a correction. Mark the correction zone where you\'d look to enter long for the continuation. Select "Correction zone" and click that level.',
+       chart:'practice-icc', tool:'level', toolLabel:'Correction zone', toolColor:'#EF5350', checkType:'levelNear',
+       hint:'The correction is the pullback AFTER the impulse — find the level price retraced back to before continuing up.',
+       okMsg:'That\'s the spot. With a confirmation candle in this correction zone you enter long for the continuation — stop just below it.',
+       failMsg:'Look at the pullback after the impulse — the correction zone is where price dipped back to, not the impulse high.',
+       noDrawMsg:'Select the Correction zone tool and click on the pullback level.'
+      },
+    ]
+  },
+  {
+    id:'csp', num:'6', icon:'🔨', color:'#26A69A',
+    name:'Candlestick Patterns',
+    desc:'Reversal & continuation candles: engulfing, hammer, stars, doji.',
+    steps:[
+      {type:'lesson', title:'Engulfing Patterns',
+       lead:'One candle swallows the last — momentum just flipped.',
+       body:`<p>A <b>bullish engulfing</b> is a green candle whose body completely covers the prior red candle's body. Buyers didn't just win — they erased the previous period entirely. It often marks the end of a pullback.</p>
+       <p>A <b>bearish engulfing</b> is the mirror: a red body engulfing the prior green one. It signals sellers seizing control at a high.</p>`,
+       chart:'cs-engulfing',
+       cap:'A bullish engulfing candle (green body engulfs the prior red) ends a dip.',
+       concept:{t:'Context is king',body:'An engulfing candle AT a support level or after a liquidity grab is far more meaningful than one in the middle of nowhere.'}
+      },
+      {type:'lesson', title:'Hammers & Shooting Stars',
+       lead:'Long wicks that reject a price.',
+       body:`<p>A <b>hammer</b> has a small body up top and a long lower wick — price was pushed down hard but buyers slammed it back up. Found at the bottom of a move, it's a bullish reversal signal.</p>
+       <p>A <b>shooting star</b> is the inverse: small body, long upper wick, found at the top of a move — sellers rejected higher prices. Bearish.</p>`,
+       chart:'cs-hammer',
+       cap:'Hammer (left) rejects lower prices. Shooting star (right) rejects higher prices.',
+       concept:{t:'Trader tip',body:'The longer the wick relative to the body, the stronger the rejection. A hammer wick should be at least 2× the body.'}
+      },
+      {type:'lesson', title:'Stars & Doji',
+       lead:'Indecision that precedes a turn.',
+       body:`<p>A <b>doji</b> has almost no body — open and close are nearly equal. It's a standoff: neither side won. After a strong trend, a doji warns the move is running out of steam.</p>
+       <p>A <b>morning star</b> (bullish) is a 3-candle combo: a big red candle, a small indecision candle, then a big green candle. An <b>evening star</b> is the bearish version at a top.</p>`,
+       chart:'cs-stars',
+       cap:'A morning star: down candle → small-bodied pause → strong up candle.',
+       concept:{t:'Key idea',body:'Single candles are clues, not commands. Combine them with structure and S/R before acting.'}
+      },
+      {type:'quiz', q:'A green candle\'s body fully covers the previous red candle\'s body. This is a…',
+       opts:['Doji','Bullish engulfing','Shooting star','Bearish engulfing'],
+       answer:1,
+       exp:'A green body engulfing the prior red body = bullish engulfing. Buyers overwhelmed the previous period.'
+      },
+      {type:'quiz', q:'At the top of a rally you see a candle with a tiny body and a long UPPER wick. That\'s a…',
+       opts:['Hammer (bullish)','Doji only','Shooting star (bearish)','Bullish engulfing'],
+       answer:2,
+       exp:'Small body + long upper wick at a top = shooting star. Sellers rejected the higher prices — bearish.'
+      },
+      {type:'practice', title:'Spot the Bullish Engulfing',
+       task:'Price has been falling. Find the candle that engulfs the previous one and flips momentum up. Select "Engulfing" and click directly on that candle.',
+       chart:'practice-engulfing', tool:'pointmark', toolLabel:'Engulfing', toolColor:'#26A69A', checkType:'markCandle',
+       hint:'Look for the first big GREEN candle whose body is taller than the red candle right before it.',
+       okMsg:'That\'s it — its green body fully engulfs the prior red candle. Buyers just took over.',
+       failMsg:'Not that one. Find the green candle whose body completely covers the red candle before it.',
+       noDrawMsg:'Select the Engulfing tool, then click on the candle.'
+      },
+    ]
+  },
+  {
+    id:'patterns', num:'7', icon:'📐', color:'#5B8DEF',
+    name:'Chart Patterns',
+    desc:'Double tops/bottoms, head & shoulders, triangles, flags.',
+    steps:[
+      {type:'lesson', title:'Double Tops & Bottoms',
+       lead:'Price tests a level twice and fails.',
+       body:`<p>A <b>double top</b> forms when price rallies to a high, pulls back, rallies to the same high again, and fails. Two peaks at one level = sellers defending. The pattern confirms when price breaks below the <b>neckline</b> (the pullback low).</p>
+       <p>A <b>double bottom</b> is the bullish mirror: two lows at the same level, confirming on a break above the neckline.</p>`,
+       chart:'cp-doubles',
+       cap:'A double bottom: two lows at support, breakout above the neckline.',
+       concept:{t:'Measured move',body:'A rough target after the break = the height of the pattern projected from the neckline.'}
+      },
+      {type:'lesson', title:'Head & Shoulders',
+       lead:'The classic reversal: three peaks.',
+       body:`<p>A <b>head and shoulders</b> top has three peaks: a high (left shoulder), a higher high (head), and a lower high (right shoulder). It signals an uptrend losing strength. The break of the <b>neckline</b> (connecting the two valleys) confirms the reversal.</p>
+       <p>An <b>inverse head & shoulders</b> is the bottoming version — three troughs, breaking up through the neckline.</p>`,
+       chart:'cp-hns',
+       cap:'Head & shoulders top: shoulder, higher head, lower shoulder, neckline break.',
+       concept:{t:'Why it works',body:'It\'s really just market structure: the lower right shoulder is the first lower high — a change of character.'}
+      },
+      {type:'lesson', title:'Triangles, Wedges & Flags',
+       lead:'Consolidation before continuation.',
+       body:`<p><b>Triangles</b> form as price coils into a tighter range — ascending (flat top, rising lows = bullish), descending (flat bottom, falling highs = bearish), or symmetrical.</p>
+       <p>A <b>flag</b> is a brief, tilted pullback after a sharp move — a pause before the trend resumes. These are continuation patterns: they usually break in the direction of the prior trend.</p>`,
+       chart:'cp-triangle',
+       cap:'An ascending triangle: flat resistance, rising support, breakout up.',
+       concept:{t:'Trader tip',body:'Wait for the breakout AND a retest of the broken line. Chasing the first break gets you faked out.'}
+      },
+      {type:'quiz', q:'Price hits $80, pulls back, hits $80 again and fails, then breaks the pullback low. This is a…',
+       opts:['Double bottom','Bull flag','Double top','Ascending triangle'],
+       answer:2,
+       exp:'Two failed peaks at the same level + a neckline break down = double top. A bearish reversal pattern.'
+      },
+      {type:'quiz', q:'A head & shoulders top is confirmed when price…',
+       opts:['Makes a higher head','Breaks below the neckline','Forms the left shoulder','Hits a new high'],
+       answer:1,
+       exp:'The pattern only confirms on the neckline break. Until then it\'s just a potential shape.'
+      },
+      {type:'practice', title:'Draw the Neckline',
+       task:'This is a double bottom. The neckline is the resistance level at the peak between the two lows. Select "Neckline" and click on that level.',
+       chart:'practice-neckline', tool:'level', toolLabel:'Neckline', toolColor:'#5B8DEF', checkType:'levelNear',
+       hint:'Find the high point BETWEEN the two bottoms — a break above it confirms the pattern.',
+       okMsg:'Correct. A close above this neckline confirms the double bottom and projects the measured move up.',
+       failMsg:'Not quite — the neckline sits at the peak between the two lows, not at the lows themselves.',
+       noDrawMsg:'Select the Neckline tool and click on the level.'
+      },
+    ]
+  },
+  {
+    id:'fib', num:'8', icon:'🌀', color:'#F5B82E',
+    name:'Fibonacci',
+    desc:'Retracements, the golden pocket, and extension targets.',
+    steps:[
+      {type:'lesson', title:'Fibonacci Retracements',
+       lead:'How deep will a pullback go?',
+       body:`<p>After an impulse move, price pulls back before continuing. <b>Fibonacci retracement</b> levels — 23.6%, 38.2%, 50%, 61.8%, 78.6% — mark common pullback depths where price tends to find support and resume.</p>
+       <p>You anchor the tool from the start of the move (the swing low) to the end (the swing high). The levels appear in between.</p>`,
+       chart:'fib-retrace',
+       cap:'Fib retracement drawn from swing low to swing high, levels marked.',
+       concept:{t:'Key idea',body:'Fibs aren\'t magic — they work because so many traders watch the same levels. They become self-fulfilling zones of interest.'}
+      },
+      {type:'lesson', title:'The Golden Pocket',
+       lead:'The 0.618–0.65 sweet spot.',
+       body:`<p>The <b>golden pocket</b> is the zone between the 0.618 and 0.65 retracement levels. It's the area many traders consider the highest-probability spot for a trend to resume.</p>
+       <p>A pullback into the golden pocket that aligns with a support level or an order block is a high-confluence entry.</p>`,
+       chart:'fib-pocket',
+       cap:'Price pulls back into the golden pocket (0.618) and bounces.',
+       concept:{t:'Confluence',body:'One signal is a guess. The golden pocket + support + a bullish engulfing candle = a real edge.'}
+      },
+      {type:'lesson', title:'Fibonacci Extensions',
+       lead:'Where might price go next?',
+       body:`<p>While retracements measure pullbacks, <b>extensions</b> project targets BEYOND the prior high. Common extension levels are 1.272, 1.618, and 2.618.</p>
+       <p>Traders use them to set take-profit targets: after entering at the golden pocket, the 1.618 extension is a frequent first target.</p>`,
+       chart:'fib-ext',
+       cap:'Extension levels (1.272, 1.618) projected above as profit targets.',
+       concept:{t:'Plan the exit',body:'Knowing your target before you enter lets you calculate risk:reward — the foundation of every good trade.'}
+      },
+      {type:'quiz', q:'The "golden pocket" refers to which retracement zone?',
+       opts:['23.6%–38.2%','around 0.618–0.65','78.6%–88.6%','exactly 0.5'],
+       answer:1,
+       exp:'The golden pocket is ~0.618–0.65 — the highest-probability area for a trend to resume after a pullback.'
+      },
+      {type:'quiz', q:'Fibonacci EXTENSIONS are mainly used to…',
+       opts:['Measure pullback depth','Project profit targets beyond the high','Draw trendlines','Find support below'],
+       answer:1,
+       exp:'Extensions (1.272, 1.618, 2.618) project targets beyond the prior swing — used for take-profits.'
+      },
+      {type:'practice', title:'Mark the Golden Pocket',
+       task:'Price made an impulse up and is pulling back. Mark the golden-pocket level (~61.8% retracement) where the trend is likely to resume. Select "0.618" and click that level.',
+       chart:'practice-fib', tool:'level', toolLabel:'0.618 pocket', toolColor:'#F5B82E', checkType:'levelNear',
+       hint:'The 0.618 level sits about two-thirds of the way DOWN from the high back toward the low of the impulse.',
+       okMsg:'Nice. That\'s the golden pocket — the highest-probability area for buyers to step back in.',
+       failMsg:'Close, but the 0.618 pocket is deeper than the halfway point — about two-thirds back toward the low.',
+       noDrawMsg:'Select the 0.618 tool and click on the level.'
+      },
+    ]
+  },
+  {
+    id:'ob', num:'9', icon:'🧱', color:'#9B7BF0',
+    name:'Order Blocks & FVG',
+    desc:'Smart-money zones: order blocks and fair value gaps.',
+    steps:[
+      {type:'lesson', title:'What is an Order Block?',
+       lead:'The last candle before the move.',
+       body:`<p>An <b>order block</b> is the last opposite-colored candle before a strong, decisive move. A <b>bullish order block</b> is the last DOWN candle before a big rally — it marks where institutions loaded up.</p>
+       <p>When price returns to that candle's zone later, it often reacts there — making the order block a precise entry area.</p>`,
+       chart:'ob-what',
+       cap:'The last down candle before the rally = the bullish order block.',
+       concept:{t:'Why it matters',body:'Institutions leave footprints. The order block is where their unfilled orders likely still rest.'}
+      },
+      {type:'lesson', title:'Fair Value Gaps (FVG)',
+       lead:'An imbalance the market wants to fill.',
+       body:`<p>A <b>fair value gap</b> is a 3-candle imbalance: a big middle candle leaves a "gap" between the wick of candle 1 and the wick of candle 3 — a price range that traded too fast, with one-sided action.</p>
+       <p>Markets tend to <b>return to fill</b> these gaps before continuing. An unfilled FVG acts like a magnet and a potential entry zone.</p>`,
+       chart:'ob-fvg',
+       cap:'A fair value gap (shaded) left by a fast candle — price returns to fill it.',
+       concept:{t:'Tell',body:'FVG + order block + golden pocket stacking in the same area is a textbook smart-money entry.'}
+      },
+      {type:'lesson', title:'Trading the Order Block',
+       lead:'Wait for the return.',
+       body:`<p>The play: identify the order block that caused a break of structure, then wait for price to <b>pull back</b> into it. Enter in the direction of the original move, with a stop just beyond the order block.</p>
+       <p>This gives you tight, defined risk and a clear invalidation: if price closes through the block, the idea is wrong.</p>`,
+       chart:'ob-trade',
+       cap:'Price returns to the bullish order block, reacts, and continues up.',
+       concept:{t:'Risk',body:'The order block\'s far edge is your stop. Small risk, structured entry — the smart-money template.'}
+      },
+      {type:'quiz', q:'A bullish order block is…',
+       opts:['The biggest green candle','The last down candle before a strong rally','Any support level','A doji at the top'],
+       answer:1,
+       exp:'A bullish order block is the last DOWN candle before a decisive up-move — where institutions accumulated.'
+      },
+      {type:'quiz', q:'A fair value gap (FVG) is created by…',
+       opts:['A slow, sideways market','A 3-candle imbalance from a fast move','A double top','A long lower wick'],
+       answer:1,
+       exp:'An FVG is a 3-candle imbalance — a fast move leaves an unfilled price gap the market tends to revisit.'
+      },
+      {type:'practice', title:'Mark the Order Block',
+       task:'Find the bullish order block — the last down candle before the strong rally. Select "Order block" and click on that candle\'s zone.',
+       chart:'practice-ob', tool:'level', toolLabel:'Order block', toolColor:'#9B7BF0', checkType:'levelNear',
+       hint:'Scan to just before the big rally began. The last RED candle before that surge is the order block.',
+       okMsg:'Exactly. That last down candle is the bullish order block — a precise zone to watch on a pullback.',
+       failMsg:'Not quite. The order block is the last DOWN candle immediately before the strong rally started.',
+       noDrawMsg:'Select the Order block tool and click on the candle\'s level.'
+      },
+    ]
+  },
+  {
+    id:'liq', num:'10', icon:'💧', color:'#3D9BFF',
+    name:'Liquidity & Smart Money',
+    desc:'Equal highs/lows, liquidity pools, inducement & stop hunts.',
+    steps:[
+      {type:'lesson', title:'Where Liquidity Rests',
+       lead:'Stops cluster in obvious places.',
+       body:`<p><b>Liquidity</b> is just a pool of pending orders — mostly stop-losses. They cluster where they're predictable: just above <b>equal highs</b> and just below <b>equal lows</b>, and beyond obvious support/resistance.</p>
+       <p>Big players need this liquidity to fill large orders, so price is often drawn toward these pools before the real move.</p>`,
+       chart:'liq-equal',
+       cap:'Equal highs — a pool of stop orders rests just above them.',
+       concept:{t:'Reframe',body:'Stop thinking "support/resistance." Start thinking "where are the stops, and who wants them?"'}
+      },
+      {type:'lesson', title:'Liquidity Grabs & Stop Hunts',
+       lead:'Sweep, then reverse.',
+       body:`<p>A <b>stop hunt</b> (liquidity grab) is when price spikes just past an obvious level — triggering everyone's stops — then sharply reverses. The spike wasn't a breakout; it was harvesting liquidity.</p>
+       <p>You saw this in the ICC track. Here's the key: the reversal AFTER the grab is the high-probability move, because the trapped traders become fuel.</p>`,
+       chart:'liq-hunt',
+       cap:'Price sweeps above equal highs (grab), traps breakout buyers, then dumps.',
+       concept:{t:'Tell',body:'A sharp wick through an obvious level that immediately reverses = a grab, not a breakout.'}
+      },
+      {type:'lesson', title:'Inducement',
+       lead:'The bait before the trap.',
+       body:`<p><b>Inducement</b> is a minor, tempting level placed before the real zone — designed to lure traders in early. Price taps the inducement (triggering eager entries), grabs that liquidity, THEN moves to the real order block or zone.</p>
+       <p>Recognizing inducement keeps you patient: you wait for the deeper, real level instead of taking the bait.</p>`,
+       concept:{t:'Discipline',body:'If an entry looks too obvious and too early, ask: is this the real zone, or the bait before it?'}
+      },
+      {type:'quiz', q:'Stop-loss orders (liquidity) tend to cluster…',
+       opts:['Randomly across the chart','Just beyond equal highs/lows and obvious levels','Only at the open','In the middle of a range'],
+       answer:1,
+       exp:'Liquidity pools where stops are predictable — just past equal highs/lows and obvious S/R.'
+      },
+      {type:'quiz', q:'Price spikes above equal highs, then immediately reverses down hard. That was most likely a…',
+       opts:['Real breakout','Liquidity grab / stop hunt','Double bottom','Bull flag'],
+       answer:1,
+       exp:'A sharp sweep past an obvious level that instantly reverses = a liquidity grab, harvesting stops.'
+      },
+      {type:'practice', title:'Mark the Liquidity Pool',
+       task:'Two highs sit at the same level (equal highs). Mark where the liquidity rests — the level the stops sit just above. Select "Liquidity" and click that level.',
+       chart:'practice-liquidity', tool:'level', toolLabel:'Liquidity', toolColor:'#3D9BFF', checkType:'levelNear',
+       hint:'Find the two peaks that top out at the same price. The liquidity pool sits right at that equal-highs level.',
+       okMsg:'Right. Stops from breakout buyers and shorts rest just above these equal highs — prime liquidity to be swept.',
+       failMsg:'Look for the two peaks that line up at the SAME price — that\'s where the liquidity pool sits.',
+       noDrawMsg:'Select the Liquidity tool and click on the equal-highs level.'
+      },
+    ]
+  },
+  {
+    id:'mtf', num:'11', icon:'⏱️', color:'#26A69A',
+    name:'Multi-Timeframe Analysis',
+    desc:'Top-down: set bias on the high timeframe, enter on the low.',
+    steps:[
+      {type:'lesson', title:'Why Timeframes Matter',
+       lead:'The same chart tells different stories.',
+       body:`<p>A market can be in an <b>uptrend on the daily</b> but a <b>downtrend on the 5-minute</b> at the same moment. Neither is wrong — they're different lenses.</p>
+       <p>Trading one timeframe blindly gets you whipsawed. The fix is to align them: use a higher timeframe for direction and a lower one for timing.</p>`,
+       chart:'mtf-why',
+       cap:'A higher-timeframe uptrend contains many smaller pullbacks and ranges.',
+       concept:{t:'Key idea',body:'Higher timeframes carry more weight. A daily level beats a 5-minute level every time.'}
+      },
+      {type:'lesson', title:'The Top-Down Approach',
+       lead:'Zoom out for bias, zoom in for entry.',
+       body:`<p>Step 1 — <b>HTF bias:</b> on the high timeframe, what's the trend and where are the key levels? That sets your direction (only longs in an uptrend).</p>
+       <p>Step 2 — <b>LTF entry:</b> drop to a lower timeframe and wait for YOUR setup (order block, golden pocket, engulfing) in the direction of the HTF bias. This stacks the odds in your favor.</p>`,
+       chart:'mtf-topdown',
+       cap:'HTF says "up." On the LTF, you take the pullback into support — with the trend.',
+       concept:{t:'The rule',body:'Trade the lower timeframe ONLY in the direction the higher timeframe allows. Bias first, entry second.'}
+      },
+      {type:'quiz', q:'The correct top-down workflow is:',
+       opts:['Entry on HTF, bias on LTF','Bias on HTF, entry on LTF','Ignore the higher timeframe','Only ever use one timeframe'],
+       answer:1,
+       exp:'Set direction (bias) on the higher timeframe, then time your entry on the lower one — with that bias.'
+      },
+      {type:'quiz', q:'Daily is clearly UP. On the 5-min you get a clean short setup. You should…',
+       opts:['Take the short — setups are setups','Be cautious; it fights the HTF bias','Always short','Close your charts'],
+       answer:1,
+       exp:'A counter-trend LTF setup fights the dominant HTF bias — lower odds. Favor entries that align with the higher timeframe.'
+      },
+      {type:'practice', title:'Mark the HTF Level',
+       task:'This is your lower-timeframe chart. The higher timeframe shows major support down here. Mark that key support level where you\'d look for a long. Select "HTF level" and click it.',
+       chart:'practice-mtf', tool:'level', toolLabel:'HTF level', toolColor:'#26A69A', checkType:'levelNear',
+       hint:'Find the level where price has repeatedly bounced — that\'s the higher-timeframe support to trust.',
+       okMsg:'Good. With HTF bias up and price at this support, a low-timeframe long setup here aligns with the trend.',
+       failMsg:'Look lower — find the level where the lows repeatedly held. That\'s your higher-timeframe support.',
+       noDrawMsg:'Select the HTF level tool and click on the support.'
+      },
+    ]
+  },
+  {
+    id:'risk', num:'12', icon:'🛡️', color:'#EF5350',
+    name:'Risk Management',
+    desc:'Position sizing, risk:reward, the 1% rule, expectancy.',
+    steps:[
+      {type:'lesson', title:'The 1% Rule',
+       lead:'Survival first. Profit second.',
+       body:`<p>The single most important rule: never risk more than <b>1% of your account</b> on one trade. On a $10,000 account, that's $100 of risk per trade.</p>
+       <p>Why? At 1% risk, you could lose 20 trades in a row and only be down ~18%. You stay in the game. Blow 20% on one trade and you now need a 25% gain just to break even.</p>`,
+       concept:{t:'The math of ruin',body:'Lose 50% and you need +100% to recover. Big losses compound against you. Small, capped risk is non-negotiable.'}
+      },
+      {type:'lesson', title:'Risk : Reward',
+       lead:'Only take trades that pay.',
+       body:`<p><b>Risk:reward (R:R)</b> compares what you risk to what you aim to make. Risk $100 to make $300 = a 1:3 R:R, or "3R."</p>
+       <p>With 1:3 trades you can be <b>wrong 60% of the time and still profit</b>. That's the power of asymmetry — your winners must outsize your losers.</p>`,
+       chart:'rm-rr',
+       cap:'Entry, stop (1R risk below), and target (3R above) = a 1:3 trade.',
+       concept:{t:'Key idea',body:'Win rate alone means nothing. A 90% win rate at 1:0.1 R:R still loses money. Always weigh R:R.'}
+      },
+      {type:'lesson', title:'Position Sizing & Expectancy',
+       lead:'Let the stop decide your size.',
+       body:`<p>Your <b>position size</b> comes from your risk, not your gut. Formula: <b>Size = (Account × 1%) ÷ (distance to stop)</b>. A wider stop means a smaller position — so your dollar risk stays fixed at 1%.</p>
+       <p><b>Expectancy</b> is your average profit per trade over many trades: (Win% × avg win) − (Loss% × avg loss). Positive expectancy + enough trades = a growing account.</p>`,
+       concept:{t:'Mindset',body:'You can\'t control any single outcome. You CAN control your risk per trade. Master that and the math works for you.'}
+      },
+      {type:'quiz', q:'On a $5,000 account using the 1% rule, your max risk per trade is…',
+       opts:['$500','$50','$5','$250'],
+       answer:1,
+       exp:'1% of $5,000 = $50. That\'s your maximum dollar risk on any single trade.'
+      },
+      {type:'quiz', q:'You risk $100 to make $300. If you win just 40% of the time over 10 trades, you…',
+       opts:['Lose money','Break exactly even','Profit (4 wins × $300 − 6 losses × $100 = +$600)','Can\'t tell'],
+       answer:2,
+       exp:'4 wins × $300 = $1,200; 6 losses × $100 = $600. Net +$600. Good R:R lets you profit with a sub-50% win rate.'
+      },
+      {type:'practice', title:'Place Your Stop',
+       task:'You\'re long at the current price. Place your stop-loss just BELOW the swing low that protects the trade. Select "Stop" and click where it belongs.',
+       chart:'practice-stop', tool:'level', toolLabel:'Stop loss', toolColor:'#EF5350', checkType:'levelBelow',
+       hint:'Your stop goes just under the most recent swing low — close enough to keep risk small, but with a little breathing room.',
+       okMsg:'Good placement — just below the swing low. Tight enough for solid R:R, with room to avoid a random wick.',
+       failMsg:'Your stop should sit just BELOW the swing low — not above it, and not miles away.',
+       noDrawMsg:'Select the Stop tool and click below the swing low.'
+      },
+    ]
+  },
+  {
+    id:'plan', num:'13', icon:'🎯', color:'#F5B82E',
+    name:'The Trade Plan',
+    desc:'Tie it together: bias → level → confirmation → entry → exit.',
+    steps:[
+      {type:'lesson', title:'The Checklist',
+       lead:'A trade is a process, not a feeling.',
+       body:`<p>Every quality trade clears the same checklist before you click buy:</p>`,
+       terms:[['1. Bias','HTF trend & direction'],['2. Level','S/R, order block, or fib zone'],['3. Liquidity','where are the stops?'],['4. Confirmation','a signal candle / structure shift'],['5. Entry','precise price'],['6. Stop','invalidation point'],['7. Target','R:R ≥ 1:2']],
+       afterTerms:`<p>If any box is unchecked, there's no trade. Discipline is saying "no" to everything that isn't your setup.</p>`,
+       concept:{t:'Key idea',body:'You don\'t need more setups. You need to wait for YOUR setup and execute it the same way every time.'}
+      },
+      {type:'lesson', title:'Confirmation & Entry',
+       lead:'Patience at the level.',
+       body:`<p>Arriving at your level isn\'t the entry — it\'s the <b>alert</b>. Now you wait for confirmation: a liquidity grab, a bullish engulfing candle, a shift in structure. The confirmation is what turns a level into a trade.</p>
+       <p>Then you enter with your stop and target already defined. No improvising mid-trade.</p>`,
+       chart:'tp-full',
+       cap:'Full setup: HTF bias up → pullback to order block → engulfing confirmation → entry, stop, target.',
+       concept:{t:'The edge',body:'Plan the trade, then trade the plan. Pre-defining entry, stop, and target removes emotion from the moment.'}
+      },
+      {type:'lesson', title:'After the Trade: Journal & Review',
+       lead:'Your chart history is your textbook.',
+       body:`<p>Win or lose, log every trade: the setup, your reason, screenshots, and the outcome. Over time your journal reveals your real edge — and your real leaks.</p>
+       <p>Review weekly. Did you follow your plan? The goal isn\'t a perfect win rate; it\'s flawless execution of a positive-expectancy process.</p>`,
+       concept:{t:'The long game',body:'Amateurs chase the next trade. Professionals refine the same process over hundreds of trades. That\'s the whole game.'}
+      },
+      {type:'quiz', q:'Arriving at your chosen level means…',
+       opts:['Enter immediately','Wait for confirmation, then enter','Move your stop','Double your size'],
+       answer:1,
+       exp:'A level is an alert, not an entry. Wait for confirmation (signal candle / structure shift) before committing.'
+      },
+      {type:'quiz', q:'The main purpose of a trading journal is to…',
+       opts:['Brag about wins','Reveal your real edge and leaks over time','Replace your trading plan','Predict the next candle'],
+       answer:1,
+       exp:'A journal turns your trade history into data — exposing what actually works and what to fix. Execution over ego.'
+      },
+      {type:'practice', title:'Mark Your Entry Zone',
+       task:'Bias is up and price is pulling back into a demand zone. Mark the entry zone where you\'d look to go long with confirmation. Select "Entry" and click the level.',
+       chart:'practice-entry', tool:'level', toolLabel:'Entry zone', toolColor:'#F5B82E', checkType:'levelNear',
+       hint:'The entry sits at the pullback level where buyers previously stepped in — the demand zone, not the highs.',
+       okMsg:'That\'s your entry zone. With HTF bias up and a confirmation candle here, this is a textbook long — stop below, target at the prior high.',
+       failMsg:'Look to the pullback area — the demand zone where price found buyers — not up near the highs.',
+       noDrawMsg:'Select the Entry tool and click on the demand zone.'
+      },
+    ]
+  },
+  {
+    id:'psych', num:'14', icon:'🧠', color:'#9B7BF0',
+    name:'Trading Psychology',
+    desc:'The mental game: discipline, emotion, and the brain on risk.',
+    steps:[
+      {type:'lesson', title:'Your Brain Is Not Built for This',
+       lead:'Markets exploit hardwired instincts.',
+       body:`<p>The same instincts that kept our ancestors alive sabotage traders. Your brain treats a losing trade like a physical threat — triggering fight-or-flight, flooding you with cortisol, and hijacking the rational, decision-making prefrontal cortex.</p>
+       <p>This is why you can know the perfect plan and still abandon it the moment real money is on the line. <b>Trading is a performance task done under stress</b> — and the first skill is recognizing that your wiring is working against you.</p>`,
+       concept:{t:'Reframe',body:'You will never fully eliminate emotion. The goal is not to feel nothing — it is to act on your plan despite what you feel.'}
+      },
+      {type:'lesson', title:'Loss Aversion & the Pain of Red',
+       lead:'A loss hurts about twice as much as an equal gain feels good.',
+       body:`<p><b>Loss aversion</b> is one of the most studied findings in behavioral science: the pain of losing $100 is roughly twice the pleasure of gaining $100. This single bias drives the most common trading mistakes.</p>
+       <p>It is why traders <b>cut winners too early</b> (locking in the good feeling) and <b>let losers run</b> (avoiding the pain of realizing the loss) — the exact opposite of "cut losses, let winners run." Your stop-loss exists to make that decision before the pain arrives.</p>`,
+       concept:{t:'The fix',body:'Pre-commit. Set your stop and target before you enter, when you are calm — then remove your ability to override them in the heat of the moment.'}
+      },
+      {type:'lesson', title:'FOMO, Revenge & Tilt',
+       lead:'The three emotional traps that blow up accounts.',
+       body:`<p><b>FOMO</b> (fear of missing out) pushes you to chase a move that already happened, entering late with bad risk. <b>Revenge trading</b> is trying to win back a loss immediately — trading from anger, not analysis. <b>Tilt</b> (borrowed from poker) is the spiral where one bad outcome wrecks your emotional control for the rest of the session.</p>
+       <p>All three share a root: <b>emotional urgency overriding process.</b> The market will be open tomorrow. There is always another setup. Urgency is almost always a signal to step away, not lean in.</p>`,
+       concept:{t:'Clinical tip',body:'Name the feeling out loud — "this is FOMO," "I am on tilt." Labeling an emotion measurably reduces its grip on your behavior; it re-engages the rational brain.'}
+      },
+      {type:'lesson', title:'Discipline as a System, Not Willpower',
+       lead:'Do not rely on being strong in the moment.',
+       body:`<p>Willpower is a finite, depletable resource — and it is weakest exactly when you are tired, stressed, or down money. Relying on "I will just be disciplined" is a plan to fail.</p>
+       <p>Professionals build <b>systems that make discipline automatic</b>: hard stop-losses, pre-written trade plans, daily loss limits that lock them out, checklists, and routines. You design the rules when calm so the disciplined choice is the only choice when emotional.</p>`,
+       concept:{t:'Key idea',body:'A daily max-loss limit (e.g. "stop after -2R") is the single most protective rule a developing trader can adopt. It caps tilt before it compounds.'}
+      },
+      {type:'lesson', title:'Process Over Outcome',
+       lead:'Judge the decision, not the result.',
+       body:`<p>A good trade can lose and a bad trade can win — over any small sample, outcome is mostly noise. If you judge yourself by P&L each day, you will reinforce bad habits that happened to work and abandon good ones that happened to fail.</p>
+       <p>Instead, score your <b>process</b>: Did I follow my plan? Was my risk correct? Did I wait for confirmation? A perfect process with a small loss is a <b>winning day.</b> Breaking every rule and getting lucky is a <b>losing day</b> — because that habit will eventually destroy you.</p>`,
+       concept:{t:'The mindset shift',body:'Detach your self-worth from any single trade. You are running a probabilistic process over hundreds of trades. Variance is the cost of doing business.'}
+      },
+      {type:'quiz', q:'Loss aversion explains why traders tend to...',
+       opts:['Cut winners early and let losers run','Cut losers early and let winners run','Never feel emotion','Always follow their plan'],
+       answer:0,
+       exp:'Because losses hurt ~2x more than gains feel good, traders rush to lock in winners and avoid realizing losses — the opposite of what works.'
+      },
+      {type:'quiz', q:'You just took a loss and immediately want to jump back in to "win it back." This is...',
+       opts:['Smart, aggressive trading','Revenge trading — a major red flag','Proper risk management','Process over outcome'],
+       answer:1,
+       exp:'Trading from the urge to recover a loss is revenge trading — decisions driven by anger, not analysis. The move is to step away.'
+      },
+      {type:'quiz', q:'The most reliable way to stay disciplined under pressure is to...',
+       opts:['Try harder to resist temptation','Rely on willpower in the moment','Build systems and rules in advance','Trade bigger to feel in control'],
+       answer:2,
+       exp:'Willpower fails under stress. Pre-built systems — hard stops, daily loss limits, checklists — make the disciplined choice automatic.'
+      },
+      {type:'quiz', q:'You followed your plan perfectly but the trade still lost. That was a...',
+       opts:['Bad day — you lost money','Good process day — outcome is noise on one trade','Sign to change your whole strategy','Reason to revenge trade'],
+       answer:1,
+       exp:'Judge the decision, not the result. Perfect process with a small loss is a winning day — that habit profits over hundreds of trades.'
       },
     ]
   },
@@ -722,39 +1162,34 @@ function buildChart(canvas, id){
       ];
       ch.draw(); return ch;
     }
-    case 'icc-overview':{
-      const piv=[100,96,/*sweep*/91,/*displace*/104,99,107];
-      candles=candlesThroughPivots(piv,5,21);
-      // force a sweep wick
-      candles[10]={open:95,high:96,low:89,close:95.5};
+    case 'icc-indication':{
+      candles=candlesThroughPivots([96,97,109],7,21);
       const ch=new Chart(canvas,candles,{height:310,padR:56});
       ch.overlays=[
-        {type:'hline',price:95.5,color:'#5B8DEF',dash:[4,3],label:'support'},
-        {type:'pivot',i:10,price:89,label:'grab',top:false,color:'#EF5350'},
-        {type:'label',text:'displacement →',i:16,price:108,color:'#26A69A'},
+        {type:'hline',price:99,color:'#5B8DEF',dash:[4,3],label:'prior high'},
+        {type:'label',text:'indication ↑',i:11,price:111,color:'#26A69A'},
       ];
       ch.draw(); return ch;
     }
-    case 'icc-sweep':{
-      const piv=[100,97,93,/*sweep*/93,103];
-      candles=candlesThroughPivots(piv,5,33);
-      candles[12]={open:94,high:95,low:88,close:94.5};
-      const ch=new Chart(canvas,candles,{height:300,padR:56});
+    case 'icc-correction':{
+      candles=candlesThroughPivots([95,109,101],7,33);
+      const ch=new Chart(canvas,candles,{height:310,padR:56});
       ch.overlays=[
-        {type:'hline',price:93.5,color:'#5B8DEF',dash:[4,3],label:'support'},
-        {type:'pivot',i:12,price:88,label:'liquidity grab',top:false,color:'#EF5350'},
+        {type:'zone',priceHigh:102.5,priceLow:99.5,color:'rgba(239,83,80,.14)'},
+        {type:'label',text:'indication',i:4,price:111,color:'#26A69A'},
+        {type:'label',text:'correction',i:11,price:96,color:'#EF5350'},
       ];
       ch.draw(); return ch;
     }
-    case 'icc-entry':{
-      const piv=[92,/*displace up*/104,99,/*pullback to zone*/100,108];
-      candles=candlesThroughPivots(piv,5,41);
-      const ch=new Chart(canvas,candles,{height:300,padR:56});
+    case 'icc-continuation':{
+      candles=candlesThroughPivots([95,109,101,116],6,41);
+      const ch=new Chart(canvas,candles,{height:320,padR:60});
       ch.overlays=[
-        {type:'zone',priceHigh:101,priceLow:98,color:'rgba(155,123,240,.18)'},
-        {type:'label',text:'entry zone',i:13,price:96,color:'#9B7BF0'},
-        {type:'hline',price:90.5,color:'#EF5350',dash:[3,3],label:'stop (below grab)'},
-        {type:'label',text:'displacement',i:3,price:106,color:'#26A69A'},
+        {type:'zone',priceHigh:102.5,priceLow:99.5,color:'rgba(239,83,80,.14)'},
+        {type:'hline',price:100.5,color:'#F5B82E',dash:[3,3],label:'entry (correction)'},
+        {type:'hline',price:97,color:'#EF5350',dash:[3,3],label:'stop'},
+        {type:'hline',price:114,color:'#26A69A',dash:[3,3],label:'target (continuation)'},
+        {type:'label',text:'indication',i:3,price:111,color:'#26A69A'},
       ];
       ch.draw(); return ch;
     }
@@ -783,12 +1218,9 @@ function buildChart(canvas, id){
       ch.draw(); return ch;
     }
     case 'practice-icc':{
-      const piv=[100,96,93,103,99,107];
-      candles=candlesThroughPivots(piv,5,81);
-      candles[10]={open:95,high:96,low:88,close:95.5};
+      candles=candlesThroughPivots([95,109,101,116],6,81);
       const ch=new Chart(canvas,candles,{height:320,padR:56});
-      ch.answerGrab={i:10,price:88};
-      ch.answerZone={price:95.5};
+      ch.answerPrice=101; // correction pullback level
       ch.draw(); return ch;
     }
     /* ── Track 6: Candlestick Patterns ── */
@@ -1067,7 +1499,7 @@ function buildChart(canvas, id){
 /* ════════════════════════════════════════════════════
    STATE
 ════════════════════════════════════════════════════ */
-const SAVE_KEY='chartlab_v1';
+const SAVE_KEY='chartlynk_v1';
 let S=loadState();
 function loadState(){
   try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||defaultState(); }
@@ -1093,7 +1525,7 @@ function render(){
 
 function topbar(){
   return `<div class="topbar">
-    <div class="brand" onclick="goHome()"><span class="logo">📊</span>Chart<span class="x">Lab</span></div>
+    <div class="brand" onclick="goHome()"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,17 7,9 12,14 17,4 22,11"/></svg></span>Chart<span class="x">LYNK</span></div>
     <div class="top-right">
       <div class="streak">🔥 ${S.streak}</div>
       <div class="xp-pill">⚡ ${S.xp} XP</div>
@@ -1129,9 +1561,9 @@ function renderHome(){
 
   app().innerHTML=topbar()+`<div class="wrap fade">
     <div class="hero">
-      <div class="kicker">Chart Literacy · For Adults</div>
-      <h1>Learn to read charts<br>with structure, not stress.</h1>
-      <p>A step-by-step path from a single candle to institutional concepts — with real charts you practice on, not just theory.</p>
+      <div class="kicker">Structure-First Trading · For Adults</div>
+      <h1>Read the market's<br>structure, not the noise.</h1>
+      <p>See how every swing links into structure — from a single candle to advanced smart-money concepts, with real charts you practice on, not just theory.</p>
     </div>
     <div class="stats">
       <div class="stat"><div class="big">${doneSteps}/${totalSteps}</div><div class="lbl">Lessons done</div></div>

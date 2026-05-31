@@ -1,4 +1,4 @@
-# Netlify config for ChartLab (static single-page site)
+# Netlify config for ChartLYNK (static single-page site)
 [build]
   publish = "."
 

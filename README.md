@@ -1,12 +1,29 @@
-# ChartLab — Learn to Read Charts
+# ChartLYNK — Read Market Structure
 
-An interactive, self-paced chart-literacy course for adults. Candlestick basics → support/resistance → trends → market structure → ICC → candlestick & chart patterns → Fibonacci → order blocks & FVG → liquidity → multi-timeframe → risk management → building a trade plan.
+A structure-first, self-paced chart-education course for adults. From a single candle to advanced smart-money concepts and the psychology behind execution — with real charts you practice on, not just theory.
 
-**13 tracks · 47 steps**, with lessons, quizzes, and hands-on charting practice where you draw levels, trendlines, and zones directly on real candlestick charts and get graded feedback.
+**14 tracks · 74 steps**, with lessons, quizzes, and hands-on charting practice where you draw levels, trendlines, and zones directly on real candlestick charts and get graded feedback.
 
 Everything is a single self-contained `index.html` — no build step, no dependencies, no backend. Progress is saved in the browser (localStorage).
 
 > Educational platform only. Not financial advice.
+
+## Curriculum
+
+1. Candlestick Basics
+2. Support & Resistance
+3. Trends & Direction
+4. Market Structure: HH / HL / LH / LL
+5. ICC — Indication · Correction · Continuation
+6. Candlestick Patterns
+7. Chart Patterns
+8. Fibonacci
+9. Order Blocks & FVG
+10. Liquidity & Smart Money
+11. Multi-Timeframe Analysis
+12. Risk Management
+13. The Trade Plan
+14. Trading Psychology
 
 ---
 
@@ -33,25 +50,20 @@ npx serve -p 5500 .
 
 1. Go to **https://app.netlify.com/drop**
 2. Drag this entire `trading-school` folder onto the page.
-3. You get a live URL instantly (e.g. `your-site.netlify.app`).
+3. You get a live URL instantly (e.g. `chartlynk.netlify.app`).
 4. Create a free Netlify account to keep the site and rename it.
 
-To update later: drag the folder again, or connect the GitHub repo (below) for auto-deploys.
+To update later: drag the folder again, or connect a GitHub repo for auto-deploys.
 
 ### Option B — GitHub Pages (free, version-controlled)
 
 ```bash
-# 1. Create a repo on GitHub (e.g. "chartlab"), then:
-git remote add origin https://github.com/<your-username>/chartlab.git
-git branch -M main
+git remote add origin https://github.com/<your-username>/chartlynk.git
 git push -u origin main
-
-# 2. On GitHub: Settings → Pages → Source: "Deploy from a branch"
-#    Branch: main / root → Save
+# On GitHub: Settings -> Pages -> Source: "Deploy from a branch" -> main / root -> Save
 ```
 
-Your site goes live at `https://<your-username>.github.io/chartlab/` within a minute.
-The included `.nojekyll` file tells Pages to serve the HTML as-is.
+Live at `https://<your-username>.github.io/chartlynk/`. The `.nojekyll` file serves the HTML as-is.
 
 ---
 
@@ -61,3 +73,7 @@ All course content lives in the `TRACKS` array near the top of the `<script>` in
 Each track has `lessons`, `quizzes`, and `practice` steps. Chart visuals are defined in the
 `buildChart()` function. Add a track by appending an object to `TRACKS` and a matching
 chart case in `buildChart()`.
+
+---
+
+ChartLYNK is an independent venture, separate from any other business or brand.
