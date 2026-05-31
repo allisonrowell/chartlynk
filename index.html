@@ -376,8 +376,25 @@ class Chart{
     if(this.userZones) for(const z of this.userZones) this._drawUserZone(z);
     for(const l of this.userLines) this._drawUserLine(l);
     for(const m of this.userMarks) this._drawUserMark(m);
+    if(this.selected) this._drawSelection(this.selected);
     // interactive anatomy spotlight
     if(this.highlight) this._spotlight();
+  }
+  _drawSelection(o){
+    const c=this.ctx; c.save();
+    c.strokeStyle='#fff'; c.lineWidth=1.5; c.setLineDash([4,3]);
+    const handle=(x,y)=>{ c.fillStyle='#fff'; c.fillRect(x-3,y-3,6,6); };
+    if(o.type==='h'){ const y=this.yOf(o.price);
+      c.strokeRect(this.plotL,y-6,this.plotW,12); handle(this.plotL+8,y); handle(this.plotR-8,y);
+    } else if(o.type==='t'){
+      c.beginPath(); c.moveTo(o.x1,o.y1); c.lineTo(o.x2,o.y2); c.stroke();
+      c.setLineDash([]); handle(o.x1,o.y1); handle(o.x2,o.y2);
+    } else if(o.priceHigh!=null){ const yH=this.yOf(o.priceHigh), yL=this.yOf(o.priceLow);
+      c.strokeRect(this.plotL,Math.min(yH,yL),this.plotW,Math.abs(yL-yH)); handle(this.plotL+8,yH); handle(this.plotL+8,yL);
+    } else if(o.x!=null){
+      c.beginPath(); c.arc(o.x,o.y,11,0,7); c.stroke();
+    }
+    c.setLineDash([]); c.restore();
   }
   _drawUserZone(z){
     const c=this.ctx;
@@ -1748,32 +1765,39 @@ function renderHome(){
 ════════════════════════════════════════════════════ */
 let sandbox={seed:1, tool:'support', chart:null, trendPts:[], history:[]};
 const SANDBOX_TOOLS=[
+  {k:'select',   label:'Select',     color:'#8B95A8', kind:'select'},
   {k:'support',  label:'Support',    color:'#26A69A', kind:'hline'},
   {k:'resistance',label:'Resistance',color:'#EF5350', kind:'hline'},
   {k:'trend',    label:'Trendline',  color:'#F5B82E', kind:'tline'},
   {k:'zone',     label:'Zone',       color:'#9B7BF0', kind:'zone'},
   {k:'mark',     label:'Marker',     color:'#3D9BFF', kind:'point'},
+  {k:'HH',       label:'HH',         color:'#26A69A', kind:'point', mlabel:'HH', up:true},
+  {k:'HL',       label:'HL',         color:'#4DD0C4', kind:'point', mlabel:'HL', up:false},
+  {k:'LH',       label:'LH',         color:'#FF7B78', kind:'point', mlabel:'LH', up:true},
+  {k:'LL',       label:'LL',         color:'#EF5350', kind:'point', mlabel:'LL', up:false},
 ];
 function openSandbox(){ sandbox.seed=(Date.now? (Date.now()%100000) : (sandbox.seed+7)); view.screen='sandbox'; render(); window.scrollTo(0,0); }
 function sandboxNewChart(){ sandbox.seed=(sandbox.seed*16807+12345)%2147483647; renderSandbox(); window.scrollTo(0,0); }
-function sandboxTool(k){ sandbox.tool=k; sandbox.trendPts=[]; document.querySelectorAll('.tool[data-sbtool]').forEach(el=>el.classList.toggle('active', el.dataset.sbtool===k)); }
-function sandboxClear(){ const ch=sandbox.chart; if(!ch)return; ch.userLines=[]; ch.userMarks=[]; ch.userZones=[]; sandbox.trendPts=[]; ch.draw(); }
+function sandboxTool(k){ sandbox.tool=k; sandbox.trendPts=[]; sandbox.selected=null; if(sandbox.chart){sandbox.chart.selected=null;sandbox.chart.draw();} document.querySelectorAll('.tool[data-sbtool]').forEach(el=>el.classList.toggle('active', el.dataset.sbtool===k)); }
+function sandboxClear(){ const ch=sandbox.chart; if(!ch)return; ch.userLines=[]; ch.userMarks=[]; ch.userZones=[]; ch.selected=null; sandbox.selected=null; sandbox.trendPts=[]; ch.draw(); }
+function sbAllObjs(ch){ return [...(ch.userZones||[]),...(ch.userLines||[]),...(ch.userMarks||[]).filter(m=>!m._tmp)]; }
 function sandboxUndo(){ const ch=sandbox.chart; if(!ch)return;
-  // pop most recent across all draw arrays by timestamp
-  const all=[...(ch.userLines||[]).map(o=>['line',o]),...(ch.userMarks||[]).map(o=>['mark',o]),...(ch.userZones||[]).map(o=>['zone',o])];
+  const all=sbAllObjs(ch).slice().sort((a,b)=>(b._t||0)-(a._t||0));
   if(!all.length) return;
-  all.sort((a,b)=>(b[1]._t||0)-(a[1]._t||0));
-  const [kind,obj]=all[0];
-  if(kind==='line') ch.userLines=ch.userLines.filter(o=>o!==obj);
-  else if(kind==='mark') ch.userMarks=ch.userMarks.filter(o=>o!==obj);
-  else if(kind==='zone') ch.userZones=ch.userZones.filter(o=>o!==obj);
-  sandbox.trendPts=[]; ch.draw();
+  sbRemove(ch, all[0]);
+  sandbox.trendPts=[]; ch.selected=null; sandbox.selected=null; ch.draw();
 }
+function sbRemove(ch,obj){
+  ch.userLines=ch.userLines.filter(o=>o!==obj);
+  ch.userMarks=ch.userMarks.filter(o=>o!==obj);
+  ch.userZones=ch.userZones.filter(o=>o!==obj);
+}
+function sandboxDelete(){ const ch=sandbox.chart; if(!ch||!sandbox.selected)return; sbRemove(ch,sandbox.selected); sandbox.selected=null; ch.selected=null; ch.draw(); }
 
 function renderSandbox(){
-  const tools=SANDBOX_TOOLS.map(t=>
-    `<div class="tool ${sandbox.tool===t.k?'active':''}" data-sbtool="${t.k}" onclick="sandboxTool('${t.k}')"><span class="dot" style="background:${t.color}"></span>${t.label}</div>`
-  ).join('');
+  const tool=t=>`<div class="tool ${sandbox.tool===t.k?'active':''}" data-sbtool="${t.k}" onclick="sandboxTool('${t.k}')"><span class="dot" style="background:${t.color}"></span>${t.label}</div>`;
+  const drawTools=SANDBOX_TOOLS.filter(t=>!['HH','HL','LH','LL'].includes(t.k)).map(tool).join('');
+  const structTools=SANDBOX_TOOLS.filter(t=>['HH','HL','LH','LL'].includes(t.k)).map(tool).join('');
   app().innerHTML=topbar()+`<div class="wrap fade">
     <div class="lesson-top">
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Tracks</button>
@@ -1781,16 +1805,18 @@ function renderSandbox(){
     </div>
     <div class="task-card" style="border-color:rgba(245,184,46,.25)">
       <div class="tlabel">🎨 Free play</div>
-      <div class="ttext">Pick a tool, then draw on the chart. Lines & zones snap to where you tap; trendlines take two taps. No grading — analyze it however you like, then load a new chart.</div>
+      <div class="ttext">Pick a tool and draw. Use <b>Select</b> to grab, move, or delete anything you've drawn. No grading — analyze it however you like.</div>
     </div>
-    <div class="tool-bar">${tools}</div>
+    <div class="tool-bar">${drawTools}</div>
+    <div class="tool-bar">${structTools}</div>
     <div class="tool-bar">
+      <div class="tool" onclick="sandboxDelete()">✕ Delete</div>
       <div class="tool" onclick="sandboxUndo()">↩️ Undo</div>
       <div class="tool" onclick="sandboxClear()">🗑️ Clear</div>
       <div class="tool" onclick="sandboxNewChart()" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">🔀 New chart</div>
     </div>
     <div class="chart-shell"><canvas id="chart"></canvas></div>
-    <div class="chart-hint">💡 Tip: tap a tool, then tap the chart. Trendline = two taps. Drag a line to fine-tune it.</div>
+    <div class="chart-hint">💡 Draw with a tool · tap <b>Select</b> then tap an item to move it · <b>Delete</b> removes the selected item.</div>
   </div>`;
 
   requestAnimationFrame(()=>{
@@ -1816,47 +1842,96 @@ function renderSandbox(){
 
 function wireUpSandbox(cv){
   const ch=sandbox.chart;
-  let dragging=false, dragObj=null;
+  let dragging=false, dragObj=null, dragMode=null, last=null;
   const T=()=> (typeof performance!=='undefined'&&performance.now)?performance.now():(sandbox._tick=(sandbox._tick||0)+1);
   const toolDef=()=>SANDBOX_TOOLS.find(t=>t.k===sandbox.tool)||SANDBOX_TOOLS[0];
   function pos(e){ const rc=cv.getBoundingClientRect();
     return {x:(e.touches?e.touches[0].clientX:e.clientX)-rc.left, y:(e.touches?e.touches[0].clientY:e.clientY)-rc.top}; }
-  function place(e){
+
+  // find the nearest drawn object to (x,y); returns {obj, mode}
+  function hitObject(x,y){
+    const TH=14;
+    // markers first (smallest)
+    for(const m of (ch.userMarks||[])){ if(m._tmp) continue;
+      if(Math.hypot(x-m.x,y-m.y)<TH+4) return {obj:m,mode:'mark'};
+    }
+    // trendline endpoints, then body
+    for(const l of (ch.userLines||[])){ if(l.type!=='t') continue;
+      if(Math.hypot(x-l.x1,y-l.y1)<TH) return {obj:l,mode:'t1'};
+      if(Math.hypot(x-l.x2,y-l.y2)<TH) return {obj:l,mode:'t2'};
+      // distance to segment
+      const dx=l.x2-l.x1, dy=l.y2-l.y1, len2=dx*dx+dy*dy||1;
+      let t=((x-l.x1)*dx+(y-l.y1)*dy)/len2; t=Math.max(0,Math.min(1,t));
+      const px=l.x1+t*dx, py=l.y1+t*dy;
+      if(Math.hypot(x-px,y-py)<TH) return {obj:l,mode:'tline'};
+    }
+    // horizontal lines
+    for(const l of (ch.userLines||[])){ if(l.type!=='h') continue;
+      if(Math.abs(y-ch.yOf(l.price))<TH) return {obj:l,mode:'hline'};
+    }
+    // zones (edges or inside)
+    for(const z of (ch.userZones||[])){
+      const yH=ch.yOf(z.priceHigh), yL=ch.yOf(z.priceLow);
+      if(Math.abs(y-yH)<TH) return {obj:z,mode:'zoneTop'};
+      if(Math.abs(y-yL)<TH) return {obj:z,mode:'zoneBot'};
+      if(y>Math.min(yH,yL)&&y<Math.max(yH,yL)) return {obj:z,mode:'zoneMove'};
+    }
+    return null;
+  }
+
+  function select(obj){ sandbox.selected=obj; ch.selected=obj; ch.draw(); }
+
+  function down(e){
     e.preventDefault();
     const {x,y}=pos(e); const td=toolDef();
+    // SELECT mode, or grabbing an existing object in any mode
+    const hit=hitObject(x,y);
+    if(td.kind==='select' || (hit && td.kind!=='tline' && td.kind!=='zone')){
+      if(hit){ dragObj=hit.obj; dragMode=hit.mode; dragging=true; last={x,y}; select(hit.obj); return; }
+      if(td.kind==='select'){ select(null); return; }
+    }
+    // otherwise: draw new
     if(td.kind==='hline'){
       const o={type:'h',price:ch.priceAt(y),color:td.color,_t:T()};
-      ch.userLines.push(o); dragObj=o;
+      ch.userLines.push(o); dragObj=o; dragMode='hline'; dragging=true; select(o);
     } else if(td.kind==='tline'){
       sandbox.trendPts.push({x,y});
       if(sandbox.trendPts.length===2){
-        ch.userLines.push({type:'t',x1:sandbox.trendPts[0].x,y1:sandbox.trendPts[0].y,x2:x,y2:y,color:td.color,_t:T()});
-        sandbox.trendPts=[];
-        ch.userMarks=ch.userMarks.filter(m=>!m._tmp);
-      } else {
-        ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()});
-      }
+        const o={type:'t',x1:sandbox.trendPts[0].x,y1:sandbox.trendPts[0].y,x2:x,y2:y,color:td.color,_t:T()};
+        ch.userLines.push(o); sandbox.trendPts=[]; ch.userMarks=ch.userMarks.filter(m=>!m._tmp); select(o);
+      } else { ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()}); ch.draw(); }
     } else if(td.kind==='zone'){
       sandbox.trendPts.push({x,y});
       if(sandbox.trendPts.length===2){
-        ch.userZones.push({priceHigh:ch.priceAt(Math.min(sandbox.trendPts[0].y,y)),priceLow:ch.priceAt(Math.max(sandbox.trendPts[0].y,y)),color:td.color,_t:T()});
-        sandbox.trendPts=[];
-        ch.userMarks=ch.userMarks.filter(m=>!m._tmp);
-      } else {
-        ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()});
-      }
+        const o={priceHigh:ch.priceAt(Math.min(sandbox.trendPts[0].y,y)),priceLow:ch.priceAt(Math.max(sandbox.trendPts[0].y,y)),color:td.color,_t:T()};
+        ch.userZones.push(o); sandbox.trendPts=[]; ch.userMarks=ch.userMarks.filter(m=>!m._tmp); select(o);
+      } else { ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()}); ch.draw(); }
     } else if(td.kind==='point'){
-      ch.userMarks.push({x,y,color:td.color,label:'',_t:T()});
+      const o={x,y,color:td.color,label:td.mlabel||'',up:td.up!==false,_t:T()};
+      ch.userMarks.push(o); dragObj=o; dragMode='mark'; dragging=true; last={x,y}; select(o);
     }
     ch.draw();
   }
-  const isDragTool=()=>{const k=toolDef().kind; return k==='hline';};
-  cv.onmousedown=e=>{dragging=true;place(e);};
-  cv.onmousemove=e=>{ if(dragging&&isDragTool()&&dragObj){ dragObj.price=ch.priceAt(pos(e).y); ch.draw(); } };
-  cv.onmouseup=()=>{dragging=false;dragObj=null;};
-  cv.ontouchstart=place;
-  cv.ontouchmove=e=>{ if(isDragTool()&&dragObj){ dragObj.price=ch.priceAt(pos(e).y); ch.draw(); } };
-  cv.ontouchend=()=>{dragObj=null;};
+  function move(e){
+    if(!dragging||!dragObj) return;
+    e.preventDefault();
+    const {x,y}=pos(e);
+    const dpx=last?x-last.x:0, dpy=last?y-last.y:0;
+    if(dragMode==='hline'){ dragObj.price=ch.priceAt(y); }
+    else if(dragMode==='mark'){ dragObj.x=x; dragObj.y=y; }
+    else if(dragMode==='t1'){ dragObj.x1=x; dragObj.y1=y; }
+    else if(dragMode==='t2'){ dragObj.x2=x; dragObj.y2=y; }
+    else if(dragMode==='tline'){ dragObj.x1+=dpx; dragObj.y1+=dpy; dragObj.x2+=dpx; dragObj.y2+=dpy; }
+    else if(dragMode==='zoneTop'){ dragObj.priceHigh=ch.priceAt(y); }
+    else if(dragMode==='zoneBot'){ dragObj.priceLow=ch.priceAt(y); }
+    else if(dragMode==='zoneMove'){ const dPrice=ch.priceAt(y)-ch.priceAt(last.y); dragObj.priceHigh+=dPrice; dragObj.priceLow+=dPrice; }
+    last={x,y};
+    ch.draw();
+  }
+  function up(){ dragging=false; dragObj=null; dragMode=null; last=null; }
+
+  cv.onmousedown=down; cv.onmousemove=move; cv.onmouseup=up; cv.onmouseleave=up;
+  cv.ontouchstart=down; cv.ontouchmove=move; cv.ontouchend=up;
 }
 
 function renderStep(){
