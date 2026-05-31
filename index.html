@@ -318,8 +318,9 @@ class Chart{
   _computeScale(){
     let min=Infinity,max=-Infinity;
     for(const c of this.candles){ if(c.low<min)min=c.low; if(c.high>max)max=c.high; }
-    const pad=(max-min)*0.08;
-    this.min=min-pad; this.max=max+pad;
+    const range=(max-min)||1;
+    this.min=min-range*(this.cfg.padBotFrac||0.08);
+    this.max=max+range*(this.cfg.padTopFrac||0.08);
     this.plotL=this.cfg.padL; this.plotR=this.w-this.cfg.padR;
     this.plotT=this.cfg.padT; this.plotB=this.h-this.cfg.padB;
     this.plotW=this.plotR-this.plotL; this.plotH=this.plotB-this.plotT;
@@ -416,6 +417,28 @@ class Chart{
         c.lineWidth=3.2; c.beginPath(); c.moveTo(x-7,this.yOf(cd.low)); c.lineTo(x+7,this.yOf(cd.low)); c.stroke(); }
       c.restore();
     };
+    const structureKeys=['HH','HL','LH','LL'];
+    if(structureKeys.includes(h)){
+      // re-draw the candles at full opacity, then ring the matching pivots
+      for(let i=0;i<this.candles.length;i++){
+        const cd=this.candles[i], x=this.xOf(i), up=cd.close>=cd.open, col=up?'#26A69A':'#EF5350';
+        c.strokeStyle=col; c.fillStyle=col; c.lineWidth=1.4;
+        c.beginPath(); c.moveTo(x,this.yOf(cd.high)); c.lineTo(x,this.yOf(cd.low)); c.stroke();
+        const yO=this.yOf(cd.open), yC=this.yOf(cd.close);
+        c.fillRect(x-bodyW/2, Math.min(yO,yC), bodyW, Math.max(2,Math.abs(yC-yO)));
+      }
+      for(const o of this.overlays){
+        if(o.type!=='pivot' || o.label!==h) continue;
+        const x=this.xOf(o.i), y=this.yOf(o.price);
+        c.save();
+        c.shadowColor='#9B7BF0'; c.shadowBlur=18;
+        c.strokeStyle='#fff'; c.lineWidth=2.6; c.beginPath(); c.arc(x,y,11,0,7); c.stroke();
+        c.fillStyle='#9B7BF0'; c.beginPath(); c.arc(x,y,4.5,0,7); c.fill();
+        c.fillStyle='#fff'; c.font='bold 12px Inter'; c.textAlign='center';
+        c.fillText(o.label, x, y+(o.top?-18:24));
+        c.restore();
+      }
+    }
     for(let i=0;i<this.candles.length;i++){
       const cd=this.candles[i], x=this.xOf(i);
       const up=cd.close>=cd.open, col=up?'#26A69A':'#EF5350';
@@ -426,12 +449,42 @@ class Chart{
       else if(h==='green' && up){ drawWick(cd,x,'#26A69A'); drawBody(cd,x,'#26A69A'); }
       else if(h==='red' && !up){ drawWick(cd,x,'#EF5350'); drawBody(cd,x,'#EF5350'); }
     }
-    const labels={body:'BODY — the open-to-close range',wick:'WICK / SHADOW — the high & low extremes',green:'GREEN — close above open (bullish)',red:'RED — close below open (bearish)',upper:'UPPER WICK — sellers rejected higher prices',lower:'LOWER WICK — buyers rejected lower prices'};
-    const cols={body:'#fff',wick:'#F5B82E',green:'#4DD0C4',red:'#FF7B78',upper:'#FF7B78',lower:'#4DD0C4'};
+    const labels={body:'BODY — the open-to-close range',wick:'WICK / SHADOW — the high & low extremes',green:'GREEN — close above open (bullish)',red:'RED — close below open (bearish)',upper:'UPPER WICK — sellers rejected higher prices',lower:'LOWER WICK — buyers rejected lower prices',HH:'HIGHER HIGH — each peak above the last',HL:'HIGHER LOW — each dip above the last',LH:'LOWER HIGH — each peak below the last',LL:'LOWER LOW — each dip below the last'};
+    const cols={body:'#fff',wick:'#F5B82E',green:'#4DD0C4',red:'#FF7B78',upper:'#FF7B78',lower:'#4DD0C4',HH:'#9B7BF0',HL:'#9B7BF0',LH:'#9B7BF0',LL:'#9B7BF0'};
     c.save();
     c.fillStyle=cols[h]||'#fff'; c.font='bold 12px Inter'; c.textAlign='center';
     c.fillText(labels[h]||'', this.w/2, this.plotT+4);
     c.restore();
+  }
+  hitTest(px,py,mode){
+    if(mode==='structure'){
+      let best=null,bd=1e9;
+      for(const o of this.overlays){ if(o.type!=='pivot') continue;
+        const d=Math.hypot(px-this.xOf(o.i),py-this.yOf(o.price));
+        if(d<bd){bd=d;best=o;}
+      }
+      return (best && bd<46) ? best.label : null;
+    }
+    // candle-based modes: find nearest candle by x
+    let i=Math.round((px-this.plotL-this.cw/2)/this.cw);
+    i=Math.max(0,Math.min(this.candles.length-1,i));
+    const cd=this.candles[i], x=this.xOf(i);
+    if(Math.abs(px-x)>this.cw*0.9) return null;
+    const yHigh=this.yOf(cd.high), yLow=this.yOf(cd.low);
+    const bodyTop=Math.min(this.yOf(cd.open),this.yOf(cd.close));
+    const bodyBot=Math.max(this.yOf(cd.open),this.yOf(cd.close));
+    const up=cd.close>=cd.open;
+    if(mode==='anatomy'){
+      if(py>=bodyTop-3 && py<=bodyBot+3) return 'body';
+      if(py>=yHigh-6 && py<=yLow+6) return 'wick';
+      return null;
+    }
+    if(mode==='wicks'){
+      if(py<bodyTop && py>=yHigh-8) return 'upper';
+      if(py>bodyBot && py<=yLow+8) return 'lower';
+      return null;
+    }
+    return null;
   }
   _drawZone(o){
     const c=this.ctx;
@@ -625,8 +678,10 @@ const TRACKS=[
        lead:'When the staircase changes direction.',
        body:`<p>In an uptrend (HH/HL), the trend continues as long as price keeps making higher highs. </p>
        <p>The moment price fails to make a higher high and instead makes a <b>Lower High</b> followed by a <b>Lower Low</b> — that's a <b>change of character</b>. The uptrend's structure is broken and a downtrend may be starting.</p>`,
+       terms:[['HH','Higher High'],['HL','Higher Low'],['LH','Lower High'],['LL','Lower Low']],
+       interactive:'structure',
        chart:'structure-shift',
-       cap:'Uptrend (HH/HL) shifts to downtrend (LH/LL). The change of character is circled.',
+       cap:'Uptrend (HH/HL) shifts to downtrend (LH/LL). Tap a label to find it on the chart.',
        concept:{t:'Why it matters',body:'Spotting the shift early is how traders exit before a reversal — or position for the new trend.'}
       },
       {type:'quiz', q:'Price was making HH and HL. Now it just printed a Lower High and a Lower Low. What happened?',
@@ -1136,7 +1191,7 @@ function buildChart(canvas, id){
         {open:100,high:112,low:97,close:110},
         {open:110,high:113,low:99,close:101},
       ];
-      cfg={height:320,padR:60};
+      cfg={height:320,padR:60,padT:26,padTopFrac:0.24,padBotFrac:0.12};
       const ch=new Chart(canvas,candles,cfg);
       // annotate first candle
       overlays=[
@@ -1158,7 +1213,7 @@ function buildChart(canvas, id){
         {open:109,high:119,low:108,close:108.5},
         {open:108,high:117,low:107,close:107},
       ];
-      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      const ch=new Chart(canvas,candles,{height:300,padR:56,padT:26,padTopFrac:0.24,padBotFrac:0.18});
       ch.overlays=[
         {type:'label',text:'buyers defend ↑',i:1,price:91,color:'#26A69A'},
         {type:'label',text:'sellers cap ↓',i:4,price:122,color:'#EF5350'},
@@ -1670,14 +1725,41 @@ function renderStep(){
     requestAnimationFrame(()=>{
       const cv=document.getElementById('chart');
       if(cv){ view.activeChart=buildChart(cv,step.chart);
-        if(step.type==='practice') wireUpPractice(t,step); }
+        if(step.type==='practice') wireUpPractice(t,step);
+        else if(step.interactive) wireUpInteractive(cv,step.interactive);
+      }
     });
   }
 }
 
+function wireUpInteractive(cv, mode){
+  cv.style.cursor='pointer';
+  const onTap=(e)=>{
+    const ch=view.activeChart; if(!ch) return;
+    const r=cv.getBoundingClientRect();
+    const px=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const py=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    const key=ch.hitTest(px,py,mode);
+    if(key){ e.preventDefault(); setHighlight(key); }
+  };
+  cv.addEventListener('click',onTap);
+  cv.addEventListener('touchstart',onTap,{passive:false});
+}
+
+// set/toggle the highlighted part and sync the matching chip
+function setHighlight(key){
+  const ch=view.activeChart; if(!ch) return;
+  const wasActive = ch.highlight===key;
+  ch.highlight = wasActive ? null : key;
+  ch.draw();
+  document.querySelectorAll('.term-btn').forEach(b=>{
+    b.classList.toggle('active', !wasActive && b.dataset.anat===key);
+  });
+}
+
 function lessonHTML(t,step){
   let terms='';
-  const keyMap={anatomy:['body','wick','green','red'],wicks:['upper','lower']};
+  const keyMap={anatomy:['body','wick','green','red'],wicks:['upper','lower'],structure:['HH','HL','LH','LL']};
   if(step.terms && keyMap[step.interactive]){
     const keys=keyMap[step.interactive];
     terms=`<div class="term-row">${step.terms.map(([a,b],i)=>`<button class="term term-btn" data-anat="${keys[i]}" onclick="anatomyClick('${keys[i]}',this)"><b>${a}</b> — ${b}</button>`).join('')}</div><div class="anatomy-hint">👆 Tap each part to light it up on the chart below</div>`;
@@ -1701,14 +1783,7 @@ function lessonHTML(t,step){
   </div>`;
 }
 
-function anatomyClick(key, btn){
-  const ch=view.activeChart; if(!ch) return;
-  const wasActive = ch.highlight===key;
-  ch.highlight = wasActive ? null : key;
-  ch.draw();
-  document.querySelectorAll('.term-btn').forEach(b=>b.classList.remove('active'));
-  if(!wasActive) btn.classList.add('active');
-}
+function anatomyClick(key, btn){ setHighlight(key); }
 
 function quizHTML(t,step){
   const opts=step.opts.map((o,i)=>{
