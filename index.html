@@ -1330,30 +1330,33 @@ function buildChart(canvas, id){
       ch.draw(); return ch;
     }
     case 'structure-labels':{
+      // pivots reached at index (p+1)*perLeg-1; perLeg=4 -> 3,7,11,15,19 (+ start at 0)
       const piv=[78,90,84,98,92,106];
       candles=candlesThroughPivots(piv,4,6);
-      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      const ch=new Chart(canvas,candles,{height:330,padR:56,padTopFrac:0.16,padBotFrac:0.14});
       ch.overlays=[
-        {type:'pivot',i:0,price:78,label:'HL',top:false,color:'#9B7BF0'},
-        {type:'pivot',i:4,price:90,label:'HH',top:true,color:'#9B7BF0'},
-        {type:'pivot',i:8,price:84,label:'HL',top:false,color:'#9B7BF0'},
-        {type:'pivot',i:12,price:98,label:'HH',top:true,color:'#9B7BF0'},
-        {type:'pivot',i:16,price:92,label:'HL',top:false,color:'#9B7BF0'},
-        {type:'pivot',i:20,price:106,label:'HH',top:true,color:'#9B7BF0'},
+        {type:'pivot',i:0, price:78, label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:3, price:90, label:'HH',top:true, color:'#9B7BF0'},
+        {type:'pivot',i:7, price:84, label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:11,price:98, label:'HH',top:true, color:'#9B7BF0'},
+        {type:'pivot',i:15,price:92, label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:19,price:106,label:'HH',top:true, color:'#9B7BF0'},
       ];
       ch.draw(); return ch;
     }
     case 'structure-shift':{
-      const piv=[80,94,88,100,/*shift*/96,90,93,82];
-      candles=candlesThroughPivots(piv,4,12);
-      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      // pivots reached at index (p+1)*perLeg-1, so with perLeg=5 -> 4,9,14,19,24
+      const piv=[82,92,87,100,95,80];
+      candles=candlesThroughPivots(piv,5,12);
+      const ch=new Chart(canvas,candles,{height:340,padR:56,padTopFrac:0.16,padBotFrac:0.18});
       ch.overlays=[
-        {type:'pivot',i:4,price:94,label:'HH',top:true,color:'#26A69A'},
-        {type:'pivot',i:8,price:88,label:'HL',top:false,color:'#26A69A'},
-        {type:'pivot',i:12,price:100,label:'HH',top:true,color:'#26A69A'},
-        {type:'pivot',i:16,price:96,label:'LH',top:true,color:'#EF5350'},
-        {type:'pivot',i:24,price:82,label:'LL',top:false,color:'#EF5350'},
-        {type:'hline',price:88,color:'#EF5350',dash:[3,3],label:'broken HL → CHoCH',width:1.5},
+        {type:'hline',price:87,color:'#EF5350',dash:[4,4],width:1.5},
+        {type:'pivot',i:4, price:92, label:'HH',top:true, color:'#26A69A'},
+        {type:'pivot',i:9, price:87, label:'HL',top:false,color:'#26A69A'},
+        {type:'pivot',i:14,price:100,label:'HH',top:true, color:'#26A69A'},
+        {type:'pivot',i:19,price:95, label:'LH',top:true, color:'#EF5350'},
+        {type:'pivot',i:24,price:80, label:'LL',top:false,color:'#EF5350'},
+        {type:'label',text:'break of HL = CHoCH',i:22,price:90,color:'#EF5350',align:'right'},
       ];
       ch.draw(); return ch;
     }
