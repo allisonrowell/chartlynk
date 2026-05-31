@@ -726,6 +726,63 @@ const TRACKS=[
     ]
   },
   {
+    id:'psych', num:'14', icon:'🧠', color:'#9B7BF0',
+    name:'Trading Psychology',
+    desc:'The mental game: discipline, emotion, and the brain on risk.',
+    steps:[
+      {type:'lesson', title:'Your Brain Is Not Built for This',
+       lead:'Markets exploit hardwired instincts.',
+       body:`<p>The same instincts that kept our ancestors alive sabotage traders. Your brain treats a losing trade like a physical threat — triggering fight-or-flight, flooding you with cortisol, and hijacking the rational, decision-making prefrontal cortex.</p>
+       <p>This is why you can know the perfect plan and still abandon it the moment real money is on the line. <b>Trading is a performance task done under stress</b> — and the first skill is recognizing that your wiring is working against you.</p>`,
+       concept:{t:'Reframe',body:'You will never fully eliminate emotion. The goal is not to feel nothing — it is to act on your plan despite what you feel.'}
+      },
+      {type:'lesson', title:'Loss Aversion & the Pain of Red',
+       lead:'A loss hurts about twice as much as an equal gain feels good.',
+       body:`<p><b>Loss aversion</b> is one of the most studied findings in behavioral science: the pain of losing $100 is roughly twice the pleasure of gaining $100. This single bias drives the most common trading mistakes.</p>
+       <p>It is why traders <b>cut winners too early</b> (locking in the good feeling) and <b>let losers run</b> (avoiding the pain of realizing the loss) — the exact opposite of "cut losses, let winners run." Your stop-loss exists to make that decision before the pain arrives.</p>`,
+       concept:{t:'The fix',body:'Pre-commit. Set your stop and target before you enter, when you are calm — then remove your ability to override them in the heat of the moment.'}
+      },
+      {type:'lesson', title:'FOMO, Revenge & Tilt',
+       lead:'The three emotional traps that blow up accounts.',
+       body:`<p><b>FOMO</b> (fear of missing out) pushes you to chase a move that already happened, entering late with bad risk. <b>Revenge trading</b> is trying to win back a loss immediately — trading from anger, not analysis. <b>Tilt</b> (borrowed from poker) is the spiral where one bad outcome wrecks your emotional control for the rest of the session.</p>
+       <p>All three share a root: <b>emotional urgency overriding process.</b> The market will be open tomorrow. There is always another setup. Urgency is almost always a signal to step away, not lean in.</p>`,
+       concept:{t:'Clinical tip',body:'Name the feeling out loud — "this is FOMO," "I am on tilt." Labeling an emotion measurably reduces its grip on your behavior; it re-engages the rational brain.'}
+      },
+      {type:'lesson', title:'Discipline as a System, Not Willpower',
+       lead:'Do not rely on being strong in the moment.',
+       body:`<p>Willpower is a finite, depletable resource — and it is weakest exactly when you are tired, stressed, or down money. Relying on "I will just be disciplined" is a plan to fail.</p>
+       <p>Professionals build <b>systems that make discipline automatic</b>: hard stop-losses, pre-written trade plans, daily loss limits that lock them out, checklists, and routines. You design the rules when calm so the disciplined choice is the only choice when emotional.</p>`,
+       concept:{t:'Key idea',body:'A daily max-loss limit (e.g. "stop after -2R") is the single most protective rule a developing trader can adopt. It caps tilt before it compounds.'}
+      },
+      {type:'lesson', title:'Process Over Outcome',
+       lead:'Judge the decision, not the result.',
+       body:`<p>A good trade can lose and a bad trade can win — over any small sample, outcome is mostly noise. If you judge yourself by P&L each day, you will reinforce bad habits that happened to work and abandon good ones that happened to fail.</p>
+       <p>Instead, score your <b>process</b>: Did I follow my plan? Was my risk correct? Did I wait for confirmation? A perfect process with a small loss is a <b>winning day.</b> Breaking every rule and getting lucky is a <b>losing day</b> — because that habit will eventually destroy you.</p>`,
+       concept:{t:'The mindset shift',body:'Detach your self-worth from any single trade. You are running a probabilistic process over hundreds of trades. Variance is the cost of doing business.'}
+      },
+      {type:'quiz', q:'Loss aversion explains why traders tend to...',
+       opts:['Cut winners early and let losers run','Cut losers early and let winners run','Never feel emotion','Always follow their plan'],
+       answer:0,
+       exp:'Because losses hurt ~2x more than gains feel good, traders rush to lock in winners and avoid realizing losses — the opposite of what works.'
+      },
+      {type:'quiz', q:'You just took a loss and immediately want to jump back in to "win it back." This is...',
+       opts:['Smart, aggressive trading','Revenge trading — a major red flag','Proper risk management','Process over outcome'],
+       answer:1,
+       exp:'Trading from the urge to recover a loss is revenge trading — decisions driven by anger, not analysis. The move is to step away.'
+      },
+      {type:'quiz', q:'The most reliable way to stay disciplined under pressure is to...',
+       opts:['Try harder to resist temptation','Rely on willpower in the moment','Build systems and rules in advance','Trade bigger to feel in control'],
+       answer:2,
+       exp:'Willpower fails under stress. Pre-built systems — hard stops, daily loss limits, checklists — make the disciplined choice automatic.'
+      },
+      {type:'quiz', q:'You followed your plan perfectly but the trade still lost. That was a...',
+       opts:['Bad day — you lost money','Good process day — outcome is noise on one trade','Sign to change your whole strategy','Reason to revenge trade'],
+       answer:1,
+       exp:'Judge the decision, not the result. Perfect process with a small loss is a winning day — that habit profits over hundreds of trades.'
+      },
+    ]
+  },
+  {
     id:'icc', num:'5', icon:'🎯', color:'#EF5350',
     name:'ICC: Indication · Correction · Continuation',
     desc:'The price-action sequence: a move shows intent, pulls back, then continues.',
@@ -1148,63 +1205,6 @@ const TRACKS=[
        okMsg:'That\'s your entry zone. With HTF bias up and a confirmation candle here, this is a textbook long — stop below, target at the prior high.',
        failMsg:'Look to the pullback area — the demand zone where price found buyers — not up near the highs.',
        noDrawMsg:'Select the Entry tool and click on the demand zone.'
-      },
-    ]
-  },
-  {
-    id:'psych', num:'14', icon:'🧠', color:'#9B7BF0',
-    name:'Trading Psychology',
-    desc:'The mental game: discipline, emotion, and the brain on risk.',
-    steps:[
-      {type:'lesson', title:'Your Brain Is Not Built for This',
-       lead:'Markets exploit hardwired instincts.',
-       body:`<p>The same instincts that kept our ancestors alive sabotage traders. Your brain treats a losing trade like a physical threat — triggering fight-or-flight, flooding you with cortisol, and hijacking the rational, decision-making prefrontal cortex.</p>
-       <p>This is why you can know the perfect plan and still abandon it the moment real money is on the line. <b>Trading is a performance task done under stress</b> — and the first skill is recognizing that your wiring is working against you.</p>`,
-       concept:{t:'Reframe',body:'You will never fully eliminate emotion. The goal is not to feel nothing — it is to act on your plan despite what you feel.'}
-      },
-      {type:'lesson', title:'Loss Aversion & the Pain of Red',
-       lead:'A loss hurts about twice as much as an equal gain feels good.',
-       body:`<p><b>Loss aversion</b> is one of the most studied findings in behavioral science: the pain of losing $100 is roughly twice the pleasure of gaining $100. This single bias drives the most common trading mistakes.</p>
-       <p>It is why traders <b>cut winners too early</b> (locking in the good feeling) and <b>let losers run</b> (avoiding the pain of realizing the loss) — the exact opposite of "cut losses, let winners run." Your stop-loss exists to make that decision before the pain arrives.</p>`,
-       concept:{t:'The fix',body:'Pre-commit. Set your stop and target before you enter, when you are calm — then remove your ability to override them in the heat of the moment.'}
-      },
-      {type:'lesson', title:'FOMO, Revenge & Tilt',
-       lead:'The three emotional traps that blow up accounts.',
-       body:`<p><b>FOMO</b> (fear of missing out) pushes you to chase a move that already happened, entering late with bad risk. <b>Revenge trading</b> is trying to win back a loss immediately — trading from anger, not analysis. <b>Tilt</b> (borrowed from poker) is the spiral where one bad outcome wrecks your emotional control for the rest of the session.</p>
-       <p>All three share a root: <b>emotional urgency overriding process.</b> The market will be open tomorrow. There is always another setup. Urgency is almost always a signal to step away, not lean in.</p>`,
-       concept:{t:'Clinical tip',body:'Name the feeling out loud — "this is FOMO," "I am on tilt." Labeling an emotion measurably reduces its grip on your behavior; it re-engages the rational brain.'}
-      },
-      {type:'lesson', title:'Discipline as a System, Not Willpower',
-       lead:'Do not rely on being strong in the moment.',
-       body:`<p>Willpower is a finite, depletable resource — and it is weakest exactly when you are tired, stressed, or down money. Relying on "I will just be disciplined" is a plan to fail.</p>
-       <p>Professionals build <b>systems that make discipline automatic</b>: hard stop-losses, pre-written trade plans, daily loss limits that lock them out, checklists, and routines. You design the rules when calm so the disciplined choice is the only choice when emotional.</p>`,
-       concept:{t:'Key idea',body:'A daily max-loss limit (e.g. "stop after -2R") is the single most protective rule a developing trader can adopt. It caps tilt before it compounds.'}
-      },
-      {type:'lesson', title:'Process Over Outcome',
-       lead:'Judge the decision, not the result.',
-       body:`<p>A good trade can lose and a bad trade can win — over any small sample, outcome is mostly noise. If you judge yourself by P&L each day, you will reinforce bad habits that happened to work and abandon good ones that happened to fail.</p>
-       <p>Instead, score your <b>process</b>: Did I follow my plan? Was my risk correct? Did I wait for confirmation? A perfect process with a small loss is a <b>winning day.</b> Breaking every rule and getting lucky is a <b>losing day</b> — because that habit will eventually destroy you.</p>`,
-       concept:{t:'The mindset shift',body:'Detach your self-worth from any single trade. You are running a probabilistic process over hundreds of trades. Variance is the cost of doing business.'}
-      },
-      {type:'quiz', q:'Loss aversion explains why traders tend to...',
-       opts:['Cut winners early and let losers run','Cut losers early and let winners run','Never feel emotion','Always follow their plan'],
-       answer:0,
-       exp:'Because losses hurt ~2x more than gains feel good, traders rush to lock in winners and avoid realizing losses — the opposite of what works.'
-      },
-      {type:'quiz', q:'You just took a loss and immediately want to jump back in to "win it back." This is...',
-       opts:['Smart, aggressive trading','Revenge trading — a major red flag','Proper risk management','Process over outcome'],
-       answer:1,
-       exp:'Trading from the urge to recover a loss is revenge trading — decisions driven by anger, not analysis. The move is to step away.'
-      },
-      {type:'quiz', q:'The most reliable way to stay disciplined under pressure is to...',
-       opts:['Try harder to resist temptation','Rely on willpower in the moment','Build systems and rules in advance','Trade bigger to feel in control'],
-       answer:2,
-       exp:'Willpower fails under stress. Pre-built systems — hard stops, daily loss limits, checklists — make the disciplined choice automatic.'
-      },
-      {type:'quiz', q:'You followed your plan perfectly but the trade still lost. That was a...',
-       opts:['Bad day — you lost money','Good process day — outcome is noise on one trade','Sign to change your whole strategy','Reason to revenge trade'],
-       answer:1,
-       exp:'Judge the decision, not the result. Perfect process with a small loss is a winning day — that habit profits over hundreds of trades.'
       },
     ]
   },
@@ -1655,6 +1655,8 @@ function buildChart(canvas, id){
    STATE
 ════════════════════════════════════════════════════ */
 const SAVE_KEY='chartlynk_v1';
+// Preview/dev: unlock every track when running locally or with ?unlock in the URL
+const PREVIEW_UNLOCK = ['localhost','127.0.0.1','0.0.0.0',''].includes(location.hostname) || location.search.includes('unlock');
 let S=loadState();
 function loadState(){
   try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||defaultState(); }
@@ -1698,7 +1700,7 @@ function renderHome(){
     const prog=S.progress[t.id]||0;
     const done=S.completed[t.id];
     const pct=Math.round(prog/t.steps.length*100);
-    const unlocked = ti===0 || S.completed[TRACKS[ti-1].id] || prog>0;
+    const unlocked = PREVIEW_UNLOCK || ti===0 || S.completed[TRACKS[ti-1].id] || prog>0;
     let pill = done?'<span class="pill pill-done">Completed</span>'
               : prog>0?'<span class="pill pill-prog">In progress</span>'
               : unlocked?'<span class="pill pill-new">Start</span>'
@@ -1706,7 +1708,7 @@ function renderHome(){
     return `<div class="track-card ${unlocked?'':'locked'}" ${unlocked?`onclick="openTrack(${ti})"`:''}>
       <div class="track-num" style="background:${t.color}20;color:${t.color}">${t.icon}</div>
       <div class="track-info">
-        <div class="track-name">${t.num}. ${t.name} ${pill}</div>
+        <div class="track-name">${ti+1}. ${t.name} ${pill}</div>
         <div class="track-desc">${t.desc}</div>
         <div class="track-meta">${t.steps.filter(s=>s.type==='lesson').length} lessons · ${t.steps.filter(s=>s.type==='quiz').length} quiz · ${t.steps.filter(s=>s.type==='practice').length} practice</div>
         ${prog>0&&!done?`<div class="mini-prog"><div style="width:${pct}%"></div></div>`:''}
