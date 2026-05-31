@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChartLab — Learn to Read Charts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0E17; --panel:#121826; --panel2:#1A2235; --line:rgba(255,255,255,.07);
+  --text:#E8ECF5; --sub:#8B95A8; --dim:#5A6478;
+  --accent:#5B8DEF; --accent2:#4A7BD8;
+  --green:#26A69A; --greenL:#4DD0C4; --red:#EF5350; --redL:#FF7B78;
+  --gold:#F5B82E; --purple:#9B7BF0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.5;
+}
+#app{min-height:100vh;display:flex;flex-direction:column}
+
+/* ── Top bar ── */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:rgba(10,14,23,.9);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.05rem;letter-spacing:-.3px;cursor:pointer}
+.brand .logo{
+  width:28px;height:28px;border-radius:7px;
+  background:linear-gradient(135deg,var(--green),var(--accent));
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.brand .x{color:var(--accent)}
+.top-right{display:flex;align-items:center;gap:14px}
+.streak{display:flex;align-items:center;gap:5px;font-size:.85rem;font-weight:700;color:var(--gold)}
+.xp-pill{
+  display:flex;align-items:center;gap:5px;font-size:.82rem;font-weight:700;
+  color:var(--accent);background:rgba(91,141,239,.12);
+  border:1px solid rgba(91,141,239,.25);border-radius:8px;padding:4px 10px;
+}
+
+/* ── Layout ── */
+.wrap{max-width:920px;width:100%;margin:0 auto;padding:22px 18px 60px}
+
+/* ── Hero ── */
+.hero{text-align:center;padding:30px 0 18px}
+.hero .kicker{font-size:.72rem;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:2.3rem;font-weight:900;letter-spacing:-1px;margin:10px 0 6px;line-height:1.1}
+.hero p{color:var(--sub);font-size:1.05rem;max-width:520px;margin:0 auto}
+.hero .cta{margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ── Buttons ── */
+.btn{
+  font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;
+  border:none;border-radius:11px;padding:13px 22px;cursor:pointer;
+  transition:transform .12s,box-shadow .12s,background .12s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 20px rgba(91,141,239,.3)}
+.btn-primary:hover{background:var(--accent2)}
+.btn-green{background:var(--green);color:#04201D;box-shadow:0 6px 20px rgba(38,166,154,.25)}
+.btn-ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn-ghost:hover{background:#222c42}
+.btn-sm{padding:8px 14px;font-size:.85rem;border-radius:9px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── Section label ── */
+.sec-label{font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin:28px 0 12px}
+
+/* ── Curriculum cards ── */
+.track-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.track-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:16px 18px;display:flex;align-items:center;gap:16px;cursor:pointer;
+  transition:border-color .15s,transform .15s,background .15s;
+}
+.track-card:hover{border-color:rgba(91,141,239,.4);transform:translateX(3px);background:var(--panel2)}
+.track-card.locked{opacity:.5;cursor:not-allowed}
+.track-card.locked:hover{transform:none;border-color:var(--line);background:var(--panel)}
+.track-num{
+  width:42px;height:42px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;
+}
+.track-info{flex:1;min-width:0}
+.track-name{font-weight:800;font-size:1.02rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.track-desc{color:var(--sub);font-size:.85rem;margin-top:2px}
+.track-meta{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--dim);margin-top:6px}
+.pill{font-size:.66rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.pill-done{background:rgba(38,166,154,.15);color:var(--greenL)}
+.pill-prog{background:rgba(245,184,46,.15);color:var(--gold)}
+.pill-new{background:rgba(91,141,239,.15);color:var(--accent)}
+.pill-soon{background:rgba(255,255,255,.06);color:var(--dim)}
+.track-arrow{color:var(--dim);font-size:1.3rem}
+
+/* progress bar inside card */
+.mini-prog{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.mini-prog>div{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:3px;transition:width .4s}
+
+/* ── Stats row ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.stat .big{font-size:1.6rem;font-weight:900;letter-spacing:-.5px}
+.stat .lbl{font-size:.72rem;color:var(--sub);font-weight:600;margin-top:2px}
+
+/* ── Lesson screen ── */
+.lesson-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.lesson-top .crumbs{font-size:.82rem;color:var(--sub);font-weight:600}
+.lesson-top .crumbs b{color:var(--text)}
+.prog-line{height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.prog-line>div{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:4px;transition:width .4s}
+.step-dots{display:flex;gap:5px;margin-bottom:20px;flex-wrap:wrap}
+.step-dots .d{flex:1;min-width:14px;height:4px;border-radius:2px;background:rgba(255,255,255,.1)}
+.step-dots .d.done{background:var(--green)}
+.step-dots .d.cur{background:var(--gold)}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card h2{font-size:1.4rem;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.card .lead{color:var(--sub);font-size:.95rem;margin-bottom:18px}
+.card p{color:var(--text);margin-bottom:14px;font-size:.96rem}
+.card p.muted{color:var(--sub)}
+
+.concept{
+  background:var(--panel2);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;margin:16px 0;font-size:.92rem;
+}
+.concept .ct{font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.concept.warn{border-left-color:var(--gold)}
+.concept.warn .ct{color:var(--gold)}
+
+.term-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.term{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:.82rem}
+.term b{color:var(--accent)}
+
+.chart-cap{font-size:.8rem;color:var(--dim);text-align:center;margin-top:8px;font-style:italic}
+
+.nav-row{display:flex;gap:10px;margin-top:22px}
+
+/* ── Quiz ── */
+.quiz-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+.quiz-q{font-size:1.1rem;font-weight:700;margin-bottom:16px}
+.quiz-opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  background:var(--panel2);border:1.5px solid var(--line);border-radius:11px;
+  padding:14px 16px;cursor:pointer;font-size:.92rem;font-weight:600;
+  transition:border-color .12s,background .12s;display:flex;gap:10px;align-items:center;
+}
+.opt:hover:not(.dis){border-color:rgba(91,141,239,.5);background:#222c42}
+.opt .key{
+  width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;flex-shrink:0;
+}
+.opt.correct{border-color:var(--green);background:rgba(38,166,154,.12)}
+.opt.correct .key{background:var(--green);color:#04201D}
+.opt.wrong{border-color:var(--red);background:rgba(239,83,80,.1)}
+.opt.wrong .key{background:var(--red);color:#fff}
+.opt.dis{cursor:default}
+.explain{margin-top:16px;padding:14px 16px;border-radius:11px;font-size:.9rem;line-height:1.55}
+.explain.ok{background:rgba(38,166,154,.1);border:1px solid rgba(38,166,154,.3);color:var(--greenL)}
+.explain.no{background:rgba(239,83,80,.1);border:1px solid rgba(239,83,80,.3);color:var(--redL)}
+
+/* ── Practice (interactive charting) ── */
+.practice-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.practice-head h2{font-size:1.3rem;font-weight:800}
+.tool-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tool{
+  background:var(--panel2);border:1.5px solid var(--line);border-radius:9px;
+  padding:8px 13px;cursor:pointer;font-size:.82rem;font-weight:700;
+  display:flex;align-items:center;gap:6px;transition:all .12s;color:var(--sub);
+}
+.tool:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.tool.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tool .dot{width:10px;height:10px;border-radius:50%}
+.chart-shell{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;position:relative}
+#chart{width:100%;display:block;border-radius:8px;cursor:crosshair;touch-action:none}
+.chart-hint{font-size:.8rem;color:var(--dim);margin-top:10px;display:flex;align-items:center;gap:6px}
+.practice-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.task-card{
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;margin-bottom:14px;
+}
+.task-card .tlabel{font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.task-card .ttext{font-size:.95rem;font-weight:600}
+.feedback-banner{
+  border-radius:11px;padding:13px 16px;margin-top:14px;font-size:.92rem;font-weight:600;
+  display:none;animation:slideDown .3s ease;
+}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.feedback-banner.show{display:block}
+.feedback-banner.ok{background:rgba(38,166,154,.12);border:1px solid rgba(38,166,154,.35);color:var(--greenL)}
+.feedback-banner.no{background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);color:var(--redL)}
+
+/* legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--sub);margin-top:10px}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+
+/* complete */
+.complete{text-align:center;padding:40px 0}
+.complete .check{
+  width:80px;height:80px;border-radius:50%;margin:0 auto 18px;
+  background:rgba(38,166,154,.15);border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;font-size:2.5rem;
+}
+.complete h2{font-size:1.8rem;font-weight:900;margin-bottom:8px}
+.complete p{color:var(--sub);margin-bottom:6px}
+.reward{display:inline-flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 18px;margin:14px 0;font-weight:700;color:var(--gold)}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:999}
+
+.fade{animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:560px){
+  .hero h1{font-size:1.9rem}
+  .wrap{padding:18px 14px 50px}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════
+   CANDLE DATA GENERATION
+   Deterministic seeded generator so charts are stable.
+════════════════════════════════════════════════════ */
+function mulberry32(seed){
+  return function(){
+    seed|=0; seed=seed+0x6D2B79F5|0;
+    let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+// Generate candles with a chosen "shape": uptrend, downtrend, range, hh-hl, etc.
+function genCandles(seed, n, opts={}){
+  const r=mulberry32(seed);
+  const drift=opts.drift||0;            // per-candle bias
+  const vol=opts.vol||1.2;              // volatility
+  let price=opts.start||100;
+  const out=[];
+  for(let i=0;i<n;i++){
+    const open=price;
+    let move=(r()-0.5)*2*vol + drift;
+    // optional waypoints to force structure
+    if(opts.wave){
+      move += Math.sin(i/opts.wave.period)*opts.wave.amp;
+    }
+    const close=Math.max(1, open+move);
+    const wickUp=r()*vol*0.9;
+    const wickDn=r()*vol*0.9;
+    const high=Math.max(open,close)+wickUp;
+    const low=Math.min(open,close)-wickDn;
+    out.push({open,high,low,close});
+    price=close;
+  }
+  return out;
+}
+// Build candles passing through explicit pivot points (for structure lessons)
+function candlesThroughPivots(pivots, perLeg, seed){
+  const r=mulberry32(seed);
+  const out=[];
+  for(let p=0;p<pivots.length-1;p++){
+    const a=pivots[p], b=pivots[p+1];
+    for(let i=0;i<perLeg;i++){
+      const t=i/perLeg, t2=(i+1)/perLeg;
+      const base=a+(b-a)*t;
+      const nextBase=a+(b-a)*t2;
+      const open=base+(r()-0.5)*1.0;
+      const close=nextBase+(r()-0.5)*1.0;
+      const high=Math.max(open,close)+r()*1.4;
+      const low=Math.min(open,close)-r()*1.4;
+      out.push({open,high,low,close});
+    }
+  }
+  return out;
+}
+
+/* ════════════════════════════════════════════════════
+   CHART RENDERER (canvas, candlesticks)
+════════════════════════════════════════════════════ */
+class Chart{
+  constructor(canvas, candles, cfg={}){
+    this.cv=canvas; this.ctx=canvas.getContext('2d');
+    this.candles=candles;
+    this.cfg=Object.assign({padL:8,padR:54,padT:14,padB:24,grid:true},cfg);
+    this.overlays=cfg.overlays||[];    // static drawn objects {type,...}
+    this.userLines=[];                 // user-drawn horizontal/trend lines
+    this.userMarks=[];                 // user-placed point markers {x,y,label,color}
+    this.dpr=window.devicePixelRatio||1;
+    this._resize();
+    this._computeScale();
+  }
+  _resize(){
+    const rect=this.cv.getBoundingClientRect();
+    this.w=rect.width||640; this.h=this.cfg.height||340;
+    this.cv.width=this.w*this.dpr; this.cv.height=this.h*this.dpr;
+    this.cv.style.height=this.h+'px';
+    this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+  }
+  _computeScale(){
+    let min=Infinity,max=-Infinity;
+    for(const c of this.candles){ if(c.low<min)min=c.low; if(c.high>max)max=c.high; }
+    const pad=(max-min)*0.08;
+    this.min=min-pad; this.max=max+pad;
+    this.plotL=this.cfg.padL; this.plotR=this.w-this.cfg.padR;
+    this.plotT=this.cfg.padT; this.plotB=this.h-this.cfg.padB;
+    this.plotW=this.plotR-this.plotL; this.plotH=this.plotB-this.plotT;
+    this.cw=this.plotW/this.candles.length;     // candle slot width
+  }
+  xOf(i){ return this.plotL + i*this.cw + this.cw/2; }
+  yOf(p){ return this.plotB - (p-this.min)/(this.max-this.min)*this.plotH; }
+  priceAt(y){ return this.min + (this.plotB-y)/this.plotH*(this.max-this.min); }
+  indexAt(x){ return Math.floor((x-this.plotL)/this.cw); }
+
+  draw(){
+    const c=this.ctx;
+    c.clearRect(0,0,this.w,this.h);
+    // background
+    c.fillStyle='#0E1420'; c.fillRect(0,0,this.w,this.h);
+    // grid + price axis
+    if(this.cfg.grid){
+      c.strokeStyle='rgba(255,255,255,.05)'; c.lineWidth=1;
+      c.fillStyle='#5A6478'; c.font='10px Inter'; c.textAlign='left';
+      const steps=5;
+      for(let i=0;i<=steps;i++){
+        const p=this.min+(this.max-this.min)*i/steps;
+        const y=this.yOf(p);
+        c.beginPath(); c.moveTo(this.plotL,y); c.lineTo(this.plotR,y); c.stroke();
+        c.fillText(p.toFixed(1), this.plotR+6, y+3);
+      }
+    }
+    // static overlays (drawn behind candles if zones)
+    for(const o of this.overlays){ if(o.type==='zone') this._drawZone(o); }
+    // candles
+    const bodyW=Math.max(2,Math.min(this.cw*0.62,16));
+    for(let i=0;i<this.candles.length;i++){
+      const cd=this.candles[i], x=this.xOf(i);
+      const up=cd.close>=cd.open;
+      const col=up?'#26A69A':'#EF5350';
+      c.strokeStyle=col; c.fillStyle=col; c.lineWidth=1.4;
+      // wick
+      c.beginPath(); c.moveTo(x,this.yOf(cd.high)); c.lineTo(x,this.yOf(cd.low)); c.stroke();
+      // body
+      const yO=this.yOf(cd.open), yC=this.yOf(cd.close);
+      const top=Math.min(yO,yC), bh=Math.max(2,Math.abs(yC-yO));
+      c.fillRect(x-bodyW/2, top, bodyW, bh);
+    }
+    // static line overlays (support/resistance/trend/labels) on top
+    for(const o of this.overlays){
+      if(o.type==='hline') this._drawHLine(o);
+      else if(o.type==='tline') this._drawTLine(o);
+      else if(o.type==='label') this._drawLabel(o);
+      else if(o.type==='pivot') this._drawPivot(o);
+    }
+    // user drawings
+    for(const l of this.userLines) this._drawUserLine(l);
+    for(const m of this.userMarks) this._drawUserMark(m);
+  }
+  _drawZone(o){
+    const c=this.ctx;
+    const y1=this.yOf(o.priceHigh), y2=this.yOf(o.priceLow);
+    c.fillStyle=o.color||'rgba(91,141,239,.12)';
+    c.fillRect(this.plotL,Math.min(y1,y2),this.plotW,Math.abs(y2-y1));
+  }
+  _drawHLine(o){
+    const c=this.ctx, y=this.yOf(o.price);
+    c.strokeStyle=o.color||'#5B8DEF'; c.lineWidth=o.width||1.5;
+    c.setLineDash(o.dash||[6,4]);
+    c.beginPath(); c.moveTo(this.plotL,y); c.lineTo(this.plotR,y); c.stroke();
+    c.setLineDash([]);
+    if(o.label){
+      c.fillStyle=o.color||'#5B8DEF'; c.font='bold 10px Inter'; c.textAlign='left';
+      c.fillText(o.label,this.plotL+4,y-5);
+    }
+  }
+  _drawTLine(o){
+    const c=this.ctx;
+    const x1=this.xOf(o.i1), y1=this.yOf(o.p1), x2=this.xOf(o.i2), y2=this.yOf(o.p2);
+    c.strokeStyle=o.color||'#F5B82E'; c.lineWidth=o.width||2;
+    c.setLineDash(o.dash||[]);
+    c.beginPath(); c.moveTo(x1,y1);
+    // extend
+    const dx=x2-x1, dy=y2-y1;
+    const ext=o.extend? (this.plotR-x2)/(dx||1):0;
+    c.lineTo(x2+dx*ext, y2+dy*ext); c.stroke();
+    c.setLineDash([]);
+    if(o.label){
+      c.fillStyle=o.color||'#F5B82E'; c.font='bold 10px Inter'; c.textAlign='left';
+      c.fillText(o.label,x2+4,y2-4);
+    }
+  }
+  _drawPivot(o){
+    const c=this.ctx, x=this.xOf(o.i), y=this.yOf(o.price);
+    const off=o.top? -14:14;
+    c.fillStyle=o.color||'#9B7BF0';
+    c.beginPath(); c.arc(x,y,3.5,0,7); c.fill();
+    c.font='bold 11px Inter'; c.textAlign='center';
+    c.fillText(o.label, x, y+off+ (o.top?0:4));
+  }
+  _drawLabel(o){
+    const c=this.ctx;
+    c.fillStyle=o.color||'#E8ECF5'; c.font='bold 11px Inter'; c.textAlign=o.align||'center';
+    c.fillText(o.text, o.x!=null?o.x:this.xOf(o.i), o.y!=null?o.y:this.yOf(o.price));
+  }
+  _drawUserLine(l){
+    const c=this.ctx;
+    c.strokeStyle=l.color; c.lineWidth=2; c.setLineDash(l.type==='h'?[2,3]:[]);
+    c.beginPath();
+    if(l.type==='h'){ const y=this.yOf(l.price); c.moveTo(this.plotL,y); c.lineTo(this.plotR,y); }
+    else { c.moveTo(l.x1,l.y1); c.lineTo(l.x2,l.y2); }
+    c.stroke(); c.setLineDash([]);
+  }
+  _drawUserMark(m){
+    const c=this.ctx;
+    c.fillStyle=m.color; c.beginPath(); c.arc(m.x,m.y,5,0,7); c.fill();
+    c.strokeStyle='#fff'; c.lineWidth=1.5; c.stroke();
+    if(m.label){
+      c.fillStyle='#fff'; c.font='bold 11px Inter'; c.textAlign='center';
+      c.fillText(m.label, m.x, m.y- (m.up?10:-18));
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   CURRICULUM
+════════════════════════════════════════════════════ */
+const TRACKS=[
+  {
+    id:'candles', num:'1', icon:'🕯️', color:'#26A69A',
+    name:'Candlestick Basics',
+    desc:'Read a single candle: open, high, low, close, body & wicks.',
+    steps:[
+      {type:'lesson', title:'Anatomy of a Candle',
+       lead:'Every candlestick packs four prices into one shape.',
+       body:`<p>A single candlestick shows the battle between buyers and sellers over one period of time — a minute, an hour, a day, whatever timeframe you choose.</p>
+       <p>It encodes <b>four prices</b>: where price <b>opened</b>, the <b>high</b>, the <b>low</b>, and where it <b>closed</b>.</p>`,
+       terms:[['Body','open → close range'],['Wick / shadow','the high & low extremes'],['Green','close above open (bullish)'],['Red','close below open (bearish)']],
+       chart:'candle-anatomy',
+       cap:'A green (bullish) candle vs a red (bearish) candle.',
+       concept:{t:'Key idea',body:'A big body = strong conviction. Long wicks = rejection — price tried to go there and got pushed back.'}
+      },
+      {type:'lesson', title:'What Wicks Tell You',
+       lead:'Wicks are where price got rejected.',
+       body:`<p>A long <b>upper wick</b> means buyers pushed price up, but sellers slammed it back down before the close. That's selling pressure.</p>
+       <p>A long <b>lower wick</b> means sellers pushed price down, but buyers bought it back up. That's buying pressure — often a sign of support.</p>`,
+       chart:'wicks',
+       cap:'Long lower wicks (left) show buyers defending. Long upper wicks (right) show sellers capping.',
+       concept:{t:'Trader tip',body:'A candle with a tiny body and long wicks on both sides is a "doji" — indecision. The market is undecided.'}
+      },
+      {type:'quiz', q:'A candle closes ABOVE where it opened. What color (by convention) and what does it mean?',
+       opts:['Red — sellers won the period','Green — buyers won the period','Green — sellers won the period','Red — buyers won the period'],
+       answer:1,
+       exp:'Close above open = bullish = green. Buyers were in control and pushed price up by the close.'
+      },
+      {type:'quiz', q:'A candle has a small body near the top and a LONG lower wick. What does the lower wick suggest?',
+       opts:['Sellers overwhelmed buyers','Price was rejected lower — buyers stepped in','Nothing, wicks are noise','The candle is bearish'],
+       answer:1,
+       exp:'A long lower wick = price dropped but buyers bought it back up before close. That rejection of lower prices is bullish pressure / potential support.'
+      },
+    ]
+  },
+  {
+    id:'sr', num:'2', icon:'📏', color:'#5B8DEF',
+    name:'Support & Resistance',
+    desc:'Find the price levels where the market reacts again and again.',
+    steps:[
+      {type:'lesson', title:'What is Support?',
+       lead:'A floor where buyers keep stepping in.',
+       body:`<p><b>Support</b> is a price level where falling prices tend to stop and bounce. Buyers see value there and step in, overpowering sellers.</p>
+       <p>The more times price touches a level and bounces, the more <b>significant</b> that level becomes — more traders are watching it.</p>`,
+       chart:'support',
+       cap:'Price bounces off the same support level three times.',
+       concept:{t:'Key idea',body:'Support isn\'t a single exact price — think of it as a zone. Price can briefly pierce it (a wick) and still hold.'}
+      },
+      {type:'lesson', title:'What is Resistance?',
+       lead:'A ceiling where sellers keep stepping in.',
+       body:`<p><b>Resistance</b> is the opposite — a price ceiling where rising prices tend to stall and reverse. Sellers see the level as expensive and offload.</p>
+       <p>When price finally <b>breaks through</b> resistance with strength, that old resistance often becomes new support. This flip is one of the most important concepts in charting.</p>`,
+       chart:'resistance',
+       cap:'Resistance rejects price twice, then breaks. Old resistance becomes support.',
+       concept:{t:'The flip',body:'Broken resistance → support. Broken support → resistance. Levels don\'t disappear, they switch roles.'}
+      },
+      {type:'quiz', q:'Price has bounced UP off $50 four separate times. $50 is acting as…',
+       opts:['Resistance','Support','A downtrend','A wick'],
+       answer:1,
+       exp:'Repeated bounces UP off a level = support. Buyers defend $50 every time price falls to it.'
+      },
+      {type:'practice', title:'Draw the Support Level',
+       task:'Price keeps bouncing off one level. Select the Support tool and click on the price level where buyers keep stepping in.',
+       chart:'practice-support',
+       tool:'hline', checkType:'supportLevel',
+       hint:'Look for the price where the lows line up. Click roughly on that level.'
+      },
+    ]
+  },
+  {
+    id:'trend', num:'3', icon:'📈', color:'#F5B82E',
+    name:'Trends & Direction',
+    desc:'Uptrend, downtrend, range — and how to draw a trendline.',
+    steps:[
+      {type:'lesson', title:'Uptrend vs Downtrend',
+       lead:'Direction is just a staircase.',
+       body:`<p>An <b>uptrend</b> is a series of higher peaks and higher valleys — price stairs up. An <b>downtrend</b> stairs down: lower peaks, lower valleys.</p>
+       <p>When price goes sideways in a band, that's a <b>range</b> (or consolidation) — no clear trend, just back-and-forth between support and resistance.</p>`,
+       chart:'trends',
+       cap:'Left: uptrend (stairs up). Middle: downtrend (stairs down). Right: range (sideways).',
+       concept:{t:'Key idea',body:'"The trend is your friend." Trading with the trend has better odds than fighting it.'}
+      },
+      {type:'lesson', title:'Drawing a Trendline',
+       lead:'Connect the swing lows (or highs).',
+       body:`<p>In an uptrend, draw a line connecting the rising <b>swing lows</b>. As long as price stays above it, the uptrend is intact.</p>
+       <p>In a downtrend, connect the falling <b>swing highs</b>. A break of the trendline is an early warning the trend may be changing.</p>`,
+       chart:'trendline',
+       cap:'A rising trendline drawn under the swing lows of an uptrend.',
+       concept:{t:'Trader tip',body:'A valid trendline needs at least 2 touches to draw, and a 3rd touch confirms it. More touches = more meaningful.'}
+      },
+      {type:'quiz', q:'Price makes peaks at 60, 70, 80 and valleys at 50, 60, 70. This is a…',
+       opts:['Downtrend','Range','Uptrend','Doji'],
+       answer:2,
+       exp:'Higher peaks (60→70→80) AND higher valleys (50→60→70) = uptrend. Price is climbing a staircase.'
+      },
+      {type:'practice', title:'Draw the Uptrend Line',
+       task:'This chart is in an uptrend. Use the Trendline tool to connect the rising swing lows. Click the first swing low, then the later swing low.',
+       chart:'practice-trendline',
+       tool:'tline', checkType:'uptrendLine',
+       hint:'Start at the lowest early valley, then click a later higher valley. The line should sit under the candles.'
+      },
+    ]
+  },
+  {
+    id:'structure', num:'4', icon:'🔠', color:'#9B7BF0',
+    name:'Market Structure: HH HL LH LL',
+    desc:'The language of swings: higher highs, higher lows, lower highs, lower lows.',
+    steps:[
+      {type:'lesson', title:'The Four Swing Labels',
+       lead:'Every trend is spelled out in four letters.',
+       body:`<p>Traders label each swing point so structure is unambiguous:</p>`,
+       terms:[['HH','Higher High'],['HL','Higher Low'],['LH','Lower High'],['LL','Lower Low']],
+       afterTerms:`<p>An <b>uptrend</b> = HH + HL repeating. A <b>downtrend</b> = LH + LL repeating. When the pattern breaks, structure is shifting.</p>`,
+       chart:'structure-labels',
+       cap:'An uptrend labeled: HL → HH → HL → HH. Price makes higher highs and higher lows.',
+       concept:{t:'Key idea',body:'Structure tells you the trend objectively. You don\'t guess — you read the sequence of HH/HL or LH/LL.'}
+      },
+      {type:'lesson', title:'Break of Structure (BOS) & Shift',
+       lead:'When the staircase changes direction.',
+       body:`<p>In an uptrend (HH/HL), the trend continues as long as price keeps making higher highs. </p>
+       <p>The moment price fails to make a higher high and instead makes a <b>Lower High</b> followed by a <b>Lower Low</b> — that's a <b>change of character</b>. The uptrend's structure is broken and a downtrend may be starting.</p>`,
+       chart:'structure-shift',
+       cap:'Uptrend (HH/HL) shifts to downtrend (LH/LL). The change of character is circled.',
+       concept:{t:'Why it matters',body:'Spotting the shift early is how traders exit before a reversal — or position for the new trend.'}
+      },
+      {type:'quiz', q:'Price was making HH and HL. Now it just printed a Lower High and a Lower Low. What happened?',
+       opts:['Uptrend confirmed stronger','Nothing changed','Structure shifted — possible trend reversal','It became a doji'],
+       answer:2,
+       exp:'HH/HL → LH/LL is a break of structure / change of character. The uptrend is broken; a downtrend may be beginning.'
+      },
+      {type:'practice', title:'Label the Swing Points',
+       task:'Identify the market structure. Use the marker tools to label each swing point. Click "HH" then click the higher high on the chart; "HL" then the higher low.',
+       chart:'practice-structure',
+       tool:'marks', checkType:'structureLabels',
+       hint:'Read left to right. Each peak that is higher than the last = HH. Each valley higher than the last = HL.'
+      },
+    ]
+  },
+  {
+    id:'icc', num:'5', icon:'🎯', color:'#EF5350',
+    name:'ICC Fundamentals',
+    desc:'Institutional Candle Concept: where smart money enters.',
+    steps:[
+      {type:'lesson', title:'What is ICC?',
+       lead:'Institutional Candle Concept — reading the footprints of big money.',
+       body:`<p><b>ICC (Institutional Candle Concept)</b> is the idea that large institutions can't enter positions all at once without moving the market. They accumulate quietly, then a decisive <b>institutional candle</b> reveals their hand.</p>
+       <p>The framework looks for: a <b>liquidity grab</b> (price sweeps a high/low to trigger stops), followed by a strong <b>displacement candle</b> back in the opposite direction — the institutional footprint.</p>`,
+       chart:'icc-overview',
+       cap:'A liquidity sweep below support, then a large institutional candle displacing upward.',
+       concept:{t:'Core sequence',body:'Liquidity grab → displacement → return to the candle\'s origin (the entry zone). That return is often the trade.'}
+      },
+      {type:'lesson', title:'The Liquidity Grab',
+       lead:'Stops get hunted before the real move.',
+       body:`<p>Below obvious support sit a cluster of stop-loss orders. Institutions push price just below it — a <b>sweep</b> — triggering those stops and grabbing cheap liquidity (the shares/contracts they need).</p>
+       <p>This shows up as a candle with a long wick piercing the level, then snapping back. The retail traders who got stopped out are the fuel for the next move.</p>`,
+       chart:'icc-sweep',
+       cap:'Price wicks below support (the grab), then reverses sharply upward.',
+       concept:{t:'Tell',body:'A fast wick through a level that immediately reverses is a classic liquidity grab — not a real breakdown.'}
+      },
+      {type:'lesson', title:'Displacement & The Entry',
+       lead:'The decisive candle marks the zone.',
+       body:`<p>After the grab, a large, fast <b>displacement candle</b> shoots in the new direction. The base of that candle (its open, or the order block before it) becomes the <b>institutional zone</b>.</p>
+       <p>Traders wait for price to <b>return</b> to that zone — a pullback — and enter in the direction of the displacement, with a stop just beyond the swept level.</p>`,
+       chart:'icc-entry',
+       cap:'Displacement candle up → pullback into the zone → continuation. Stop sits below the grab.',
+       concept:{t:'Risk',body:'The swept low gives you a precise invalidation: if price closes back below it, the idea is wrong. Tight, defined risk.'}
+      },
+      {type:'quiz', q:'In ICC, what is the purpose of a "liquidity grab" below support?',
+       opts:['To confirm a real breakdown','To trigger stops and absorb orders before reversing','To draw a trendline','To create a doji'],
+       answer:1,
+       exp:'The grab sweeps stop-losses below support, giving institutions the liquidity (and cheap fills) they need before driving price the other way.'
+      },
+      {type:'practice', title:'Mark the ICC Setup',
+       task:'Find the institutional setup. Use "Grab" to mark the liquidity sweep (the wick low), then "Zone" to mark the displacement candle\'s entry level.',
+       chart:'practice-icc', tool:'icc', checkType:'iccSetup',
+       hint:'The sweep is the lowest wick that pierces support then reverses. The zone is the base of the big candle that shot up after.'
+      },
+    ]
+  },
+];
+
+/* ════════════════════════════════════════════════════
+   CHART BUILDERS (per lesson id)
+════════════════════════════════════════════════════ */
+function buildChart(canvas, id){
+  let candles, overlays=[], cfg={height:320};
+  switch(id){
+    case 'candle-anatomy':{
+      candles=[
+        {open:100,high:112,low:97,close:110},
+        {open:110,high:113,low:99,close:101},
+      ];
+      cfg={height:320,padR:60};
+      const ch=new Chart(canvas,candles,cfg);
+      // annotate first candle
+      overlays=[
+        {type:'label',text:'OPEN',i:0,price:100.0,align:'right',color:'#8B95A8'},
+        {type:'label',text:'CLOSE',i:0,price:110.0,align:'right',color:'#8B95A8'},
+        {type:'label',text:'HIGH',i:0,price:112,align:'center',color:'#8B95A8'},
+        {type:'label',text:'LOW',i:0,price:96.3,align:'center',color:'#8B95A8'},
+        {type:'label',text:'BULLISH',i:0,price:114,color:'#26A69A'},
+        {type:'label',text:'BEARISH',i:1,price:115,color:'#EF5350'},
+      ];
+      ch.overlays=overlays; ch.draw(); return ch;
+    }
+    case 'wicks':{
+      candles=[
+        {open:104,high:106,low:94,close:103},
+        {open:103,high:105,low:95,close:104},
+        {open:104,high:106,low:96,close:105.5},
+        {open:108,high:118,low:107,close:109},
+        {open:109,high:119,low:108,close:108.5},
+        {open:108,high:117,low:107,close:107},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'label',text:'buyers defend ↑',i:1,price:91,color:'#26A69A'},
+        {type:'label',text:'sellers cap ↓',i:4,price:122,color:'#EF5350'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'support':{
+      candles=candlesThroughPivots([100,88,99,87.5,101,88.5,104],7,7);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[{type:'hline',price:87.7,color:'#26A69A',label:'SUPPORT',width:2}];
+      ch.draw(); return ch;
+    }
+    case 'resistance':{
+      candles=candlesThroughPivots([90,101,92,101.5,93,108],8,11);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:101.5,color:'#EF5350',label:'RESISTANCE → becomes support',width:2},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'trends':{
+      // three segments in one chart
+      const up=candlesThroughPivots([80,86,83,90,87,95],4,3);
+      const down=candlesThroughPivots([95,89,92,84,87,79],4,5);
+      const range=candlesThroughPivots([79,84,79.5,84,79,84,80],3,9);
+      candles=[...up,...down,...range];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'label',text:'UPTREND',i:3,price:98,color:'#26A69A'},
+        {type:'label',text:'DOWNTREND',i:15,price:97,color:'#EF5350'},
+        {type:'label',text:'RANGE',i:30,price:88,color:'#5B8DEF'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'trendline':{
+      candles=candlesThroughPivots([80,87,83,91,87,96,92,101],4,4);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'tline',i1:2,p1:82.5,i2:18,p2:91.5,color:'#F5B82E',label:'trendline',extend:true,width:2},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'structure-labels':{
+      const piv=[78,90,84,98,92,106];
+      candles=candlesThroughPivots(piv,4,6);
+      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      ch.overlays=[
+        {type:'pivot',i:0,price:78,label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:4,price:90,label:'HH',top:true,color:'#9B7BF0'},
+        {type:'pivot',i:8,price:84,label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:12,price:98,label:'HH',top:true,color:'#9B7BF0'},
+        {type:'pivot',i:16,price:92,label:'HL',top:false,color:'#9B7BF0'},
+        {type:'pivot',i:20,price:106,label:'HH',top:true,color:'#9B7BF0'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'structure-shift':{
+      const piv=[80,94,88,100,/*shift*/96,90,93,82];
+      candles=candlesThroughPivots(piv,4,12);
+      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      ch.overlays=[
+        {type:'pivot',i:4,price:94,label:'HH',top:true,color:'#26A69A'},
+        {type:'pivot',i:8,price:88,label:'HL',top:false,color:'#26A69A'},
+        {type:'pivot',i:12,price:100,label:'HH',top:true,color:'#26A69A'},
+        {type:'pivot',i:16,price:96,label:'LH',top:true,color:'#EF5350'},
+        {type:'pivot',i:24,price:82,label:'LL',top:false,color:'#EF5350'},
+        {type:'hline',price:88,color:'#EF5350',dash:[3,3],label:'broken HL → CHoCH',width:1.5},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'icc-overview':{
+      const piv=[100,96,/*sweep*/91,/*displace*/104,99,107];
+      candles=candlesThroughPivots(piv,5,21);
+      // force a sweep wick
+      candles[10]={open:95,high:96,low:89,close:95.5};
+      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      ch.overlays=[
+        {type:'hline',price:95.5,color:'#5B8DEF',dash:[4,3],label:'support'},
+        {type:'pivot',i:10,price:89,label:'grab',top:false,color:'#EF5350'},
+        {type:'label',text:'displacement →',i:16,price:108,color:'#26A69A'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'icc-sweep':{
+      const piv=[100,97,93,/*sweep*/93,103];
+      candles=candlesThroughPivots(piv,5,33);
+      candles[12]={open:94,high:95,low:88,close:94.5};
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:93.5,color:'#5B8DEF',dash:[4,3],label:'support'},
+        {type:'pivot',i:12,price:88,label:'liquidity grab',top:false,color:'#EF5350'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'icc-entry':{
+      const piv=[92,/*displace up*/104,99,/*pullback to zone*/100,108];
+      candles=candlesThroughPivots(piv,5,41);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'zone',priceHigh:101,priceLow:98,color:'rgba(155,123,240,.18)'},
+        {type:'label',text:'entry zone',i:13,price:96,color:'#9B7BF0'},
+        {type:'hline',price:90.5,color:'#EF5350',dash:[3,3],label:'stop (below grab)'},
+        {type:'label',text:'displacement',i:3,price:106,color:'#26A69A'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── practice charts (no answer overlays) ── */
+    case 'practice-support':{
+      candles=candlesThroughPivots([102,90,100,89.5,103,90,106],7,55);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=90; // support level
+      ch.draw(); return ch;
+    }
+    case 'practice-trendline':{
+      candles=candlesThroughPivots([78,86,82,92,88,98,94,104],4,61);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerSlope='up';
+      ch.draw(); return ch;
+    }
+    case 'practice-structure':{
+      const piv=[80,92,86,100,94,108];
+      candles=candlesThroughPivots(piv,4,71);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPivots=[
+        {i:4,price:92,label:'HH',top:true},
+        {i:8,price:86,label:'HL',top:false},
+        {i:12,price:100,label:'HH',top:true},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'practice-icc':{
+      const piv=[100,96,93,103,99,107];
+      candles=candlesThroughPivots(piv,5,81);
+      candles[10]={open:95,high:96,low:88,close:95.5};
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerGrab={i:10,price:88};
+      ch.answerZone={price:95.5};
+      ch.draw(); return ch;
+    }
+    /* ── Track 6: Candlestick Patterns ── */
+    case 'cs-engulfing':{
+      candles=[
+        {open:108,high:109,low:104,close:105},
+        {open:105,high:106,low:101,close:102},
+        {open:102,high:103,low:98,close:99},
+        {open:98.5,high:106,low:98,close:105.5},
+        {open:105.5,high:109,low:104,close:108},
+        {open:108,high:112,low:107,close:111},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[{type:'label',text:'bullish engulfing ↑',i:3,price:95,color:'#26A69A'}];
+      ch.draw(); return ch;
+    }
+    case 'cs-hammer':{
+      candles=[
+        {open:104,high:105,low:103,close:104.2},
+        {open:104,high:104.5,low:96,close:103.5},
+        {open:103.5,high:108,low:103,close:107.5},
+        {open:107.5,high:115,low:107,close:108},
+        {open:108,high:109,low:103,close:104},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'label',text:'hammer',i:1,price:93.5,color:'#26A69A'},
+        {type:'label',text:'shooting star',i:3,price:118,color:'#EF5350'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'cs-stars':{
+      candles=[
+        {open:106,high:107,low:101,close:101.5},
+        {open:100.6,high:101.6,low:99.6,close:100.9},
+        {open:101.5,high:107,low:101,close:106.5},
+        {open:106.5,high:110,low:106,close:109},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[{type:'label',text:'morning star',i:1,price:97,color:'#26A69A'}];
+      ch.draw(); return ch;
+    }
+    /* ── Track 7: Chart Patterns ── */
+    case 'cp-doubles':{
+      candles=candlesThroughPivots([100,90,98,90,104],6,101);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:98,color:'#5B8DEF',label:'neckline'},
+        {type:'pivot',i:6,price:90,label:'bottom',top:false,color:'#26A69A'},
+        {type:'pivot',i:18,price:90,label:'bottom',top:false,color:'#26A69A'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'cp-hns':{
+      candles=candlesThroughPivots([86,98,92,105,92,99,84],5,103);
+      const ch=new Chart(canvas,candles,{height:310,padR:56});
+      ch.overlays=[
+        {type:'pivot',i:5,price:98,label:'LS',top:true,color:'#9B7BF0'},
+        {type:'pivot',i:15,price:105,label:'H',top:true,color:'#9B7BF0'},
+        {type:'pivot',i:25,price:99,label:'RS',top:true,color:'#9B7BF0'},
+        {type:'hline',price:92,color:'#EF5350',dash:[4,3],label:'neckline'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'cp-triangle':{
+      candles=candlesThroughPivots([90,100,93,100,96,100,99,106],4,107);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:100,color:'#EF5350',label:'resistance'},
+        {type:'tline',i1:0,p1:90,i2:24,p2:99,color:'#26A69A',extend:false,width:2,label:'rising support'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 8: Fibonacci ── */
+    case 'fib-retrace':{
+      candles=candlesThroughPivots([90,110,100],8,111);
+      const ch=new Chart(canvas,candles,{height:310,padR:60});
+      ch.overlays=[
+        {type:'hline',price:110,color:'#8B95A8',dash:[2,3],label:'1.0'},
+        {type:'hline',price:102.36,color:'#F5B82E',dash:[4,3],label:'0.382'},
+        {type:'hline',price:100,color:'#F5B82E',dash:[4,3],label:'0.5'},
+        {type:'hline',price:97.64,color:'#9B7BF0',dash:[4,3],label:'0.618'},
+        {type:'hline',price:90,color:'#8B95A8',dash:[2,3],label:'0'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'fib-pocket':{
+      candles=candlesThroughPivots([90,110,97.6,113],7,113);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'zone',priceHigh:97.6,priceLow:96.7,color:'rgba(245,184,46,.2)'},
+        {type:'label',text:'golden pocket',i:14,price:94.5,color:'#F5B82E'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'fib-ext':{
+      candles=candlesThroughPivots([90,110,98,116],7,117);
+      const ch=new Chart(canvas,candles,{height:310,padR:60});
+      ch.overlays=[
+        {type:'hline',price:115.4,color:'#26A69A',dash:[4,3],label:'1.272 target'},
+        {type:'hline',price:110,color:'#8B95A8',dash:[2,3],label:'prior high'},
+        {type:'label',text:'1.618 → 122',i:2,price:119,color:'#26A69A'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 9: Order Blocks & FVG ── */
+    case 'ob-what':{
+      candles=[
+        {open:99,high:100,low:97,close:98},
+        {open:98,high:99,low:96,close:96.5},
+        {open:96.5,high:103,low:96,close:102.5},
+        {open:102.5,high:107,low:102,close:106},
+        {open:106,high:110,low:105,close:109},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'zone',priceHigh:98,priceLow:96.3,color:'rgba(155,123,240,.2)'},
+        {type:'label',text:'order block',i:1,price:93.5,color:'#9B7BF0'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'ob-fvg':{
+      candles=[
+        {open:96,high:98,low:95,close:97},
+        {open:97.5,high:106,low:97,close:105},
+        {open:105,high:107,low:101,close:106},
+        {open:106,high:109,low:104,close:108},
+      ];
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'zone',priceHigh:101,priceLow:98,color:'rgba(91,141,239,.2)'},
+        {type:'label',text:'fair value gap',i:3,price:99.5,color:'#5B8DEF'},
+      ];
+      ch.draw(); return ch;
+    }
+    case 'ob-trade':{
+      candles=candlesThroughPivots([96,107,99,110],6,119);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'zone',priceHigh:100,priceLow:98,color:'rgba(155,123,240,.18)'},
+        {type:'label',text:'order block (return)',i:11,price:95.5,color:'#9B7BF0'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 10: Liquidity ── */
+    case 'liq-equal':{
+      candles=candlesThroughPivots([92,101,95,101,96],6,121);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[{type:'hline',price:101,color:'#3D9BFF',label:'equal highs — liquidity'}];
+      ch.draw(); return ch;
+    }
+    case 'liq-hunt':{
+      candles=candlesThroughPivots([92,100.5,96,100.5,97],5,123);
+      candles.push({open:97.5,high:104,low:97,close:98});
+      candles.push({open:98,high:99,low:92,close:93});
+      candles.push({open:93,high:94,low:88,close:89});
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:100.5,color:'#3D9BFF',dash:[4,3],label:'equal highs'},
+        {type:'pivot',i:candles.length-3,price:104,label:'grab',top:true,color:'#EF5350'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 11: Multi-Timeframe ── */
+    case 'mtf-why':{
+      candles=candlesThroughPivots([80,90,86,98,93,107],5,131);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[{type:'label',text:'higher-timeframe uptrend ↗',i:8,price:104,color:'#26A69A'}];
+      ch.draw(); return ch;
+    }
+    case 'mtf-topdown':{
+      candles=candlesThroughPivots([88,98,91,100],6,133);
+      const ch=new Chart(canvas,candles,{height:300,padR:56});
+      ch.overlays=[
+        {type:'hline',price:91,color:'#26A69A',label:'HTF support — buy zone'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 12: Risk ── */
+    case 'rm-rr':{
+      candles=candlesThroughPivots([99,101,100,103],6,141);
+      const ch=new Chart(canvas,candles,{height:320,padR:60});
+      ch.overlays=[
+        {type:'zone',priceHigh:109,priceLow:100,color:'rgba(38,166,154,.1)'},
+        {type:'zone',priceHigh:100,priceLow:97,color:'rgba(239,83,80,.1)'},
+        {type:'hline',price:100,color:'#8B95A8',label:'entry'},
+        {type:'hline',price:97,color:'#EF5350',label:'stop  (1R risk)'},
+        {type:'hline',price:109,color:'#26A69A',label:'target  (3R)'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── Track 13: Trade Plan ── */
+    case 'tp-full':{
+      candles=candlesThroughPivots([88,100,94,108],6,151);
+      const ch=new Chart(canvas,candles,{height:320,padR:60});
+      ch.overlays=[
+        {type:'zone',priceHigh:95,priceLow:93,color:'rgba(155,123,240,.18)'},
+        {type:'hline',price:94,color:'#F5B82E',label:'entry (order block)'},
+        {type:'hline',price:91,color:'#EF5350',dash:[3,3],label:'stop'},
+        {type:'hline',price:108,color:'#26A69A',dash:[3,3],label:'target'},
+      ];
+      ch.draw(); return ch;
+    }
+    /* ── New practice charts ── */
+    case 'practice-engulfing':{
+      candles=[
+        {open:110,high:111,low:106,close:107},
+        {open:107,high:108,low:103,close:104},
+        {open:104,high:105,low:100,close:101},
+        {open:101,high:102,low:98,close:98.5},
+        {open:98.5,high:99,low:95,close:96},
+        {open:95.5,high:103,low:95,close:102.5},
+        {open:102.5,high:106,low:101,close:105},
+        {open:105,high:109,low:104,close:108},
+      ];
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerIndex=5;
+      ch.draw(); return ch;
+    }
+    case 'practice-neckline':{
+      candles=candlesThroughPivots([102,90,99,90,104],6,201);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=99;
+      ch.draw(); return ch;
+    }
+    case 'practice-fib':{
+      candles=candlesThroughPivots([88,110,97],8,211);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=110-0.618*(110-88); // ~96.4
+      ch.draw(); return ch;
+    }
+    case 'practice-ob':{
+      candles=[
+        {open:100,high:101,low:98,close:99},
+        {open:99,high:100,low:97,close:97.3},
+        {open:97.3,high:104,low:97,close:103.5},
+        {open:103.5,high:108,low:103,close:107},
+        {open:107,high:111,low:106,close:110},
+      ];
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=98;
+      ch.draw(); return ch;
+    }
+    case 'practice-liquidity':{
+      candles=candlesThroughPivots([92,101,95,101,96],6,221);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=101;
+      ch.draw(); return ch;
+    }
+    case 'practice-mtf':{
+      candles=candlesThroughPivots([100,89,99,89,103],6,231);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=89;
+      ch.draw(); return ch;
+    }
+    case 'practice-stop':{
+      candles=candlesThroughPivots([100,95,103],8,241);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=95;
+      ch.draw(); return ch;
+    }
+    case 'practice-entry':{
+      candles=candlesThroughPivots([90,104,96],8,251);
+      const ch=new Chart(canvas,candles,{height:320,padR:56});
+      ch.answerPrice=96;
+      ch.draw(); return ch;
+    }
+    default:{
+      candles=genCandles(1,30,{vol:1.5});
+      const ch=new Chart(canvas,candles,{height:300});
+      ch.draw(); return ch;
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════ */
+const SAVE_KEY='chartlab_v1';
+let S=loadState();
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem(SAVE_KEY))||defaultState(); }
+  catch{ return defaultState(); }
+}
+function defaultState(){
+  return {xp:0, streak:1, progress:{}, completed:{}};
+  // progress[trackId] = stepIndex reached; completed[trackId]=true
+}
+function persist(){ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
+
+let view={screen:'home', track:null, step:0, answered:false, sel:null, activeChart:null, tool:null, practiceDone:false};
+
+/* ════════════════════════════════════════════════════
+   RENDER
+════════════════════════════════════════════════════ */
+const app=()=>document.getElementById('app');
+function render(){
+  if(view.screen==='home') renderHome();
+  else if(view.screen==='step') renderStep();
+  else if(view.screen==='complete') renderComplete();
+}
+
+function topbar(){
+  return `<div class="topbar">
+    <div class="brand" onclick="goHome()"><span class="logo">📊</span>Chart<span class="x">Lab</span></div>
+    <div class="top-right">
+      <div class="streak">🔥 ${S.streak}</div>
+      <div class="xp-pill">⚡ ${S.xp} XP</div>
+    </div>
+  </div>`;
+}
+
+function renderHome(){
+  const totalSteps=TRACKS.reduce((a,t)=>a+t.steps.length,0);
+  const doneSteps=Object.values(S.progress).reduce((a,v)=>a+v,0);
+  const tracksDone=Object.keys(S.completed).length;
+
+  const cards=TRACKS.map((t,ti)=>{
+    const prog=S.progress[t.id]||0;
+    const done=S.completed[t.id];
+    const pct=Math.round(prog/t.steps.length*100);
+    const unlocked = ti===0 || S.completed[TRACKS[ti-1].id] || prog>0;
+    let pill = done?'<span class="pill pill-done">Completed</span>'
+              : prog>0?'<span class="pill pill-prog">In progress</span>'
+              : unlocked?'<span class="pill pill-new">Start</span>'
+              : '<span class="pill pill-soon">Locked</span>';
+    return `<div class="track-card ${unlocked?'':'locked'}" ${unlocked?`onclick="openTrack(${ti})"`:''}>
+      <div class="track-num" style="background:${t.color}20;color:${t.color}">${t.icon}</div>
+      <div class="track-info">
+        <div class="track-name">${t.num}. ${t.name} ${pill}</div>
+        <div class="track-desc">${t.desc}</div>
+        <div class="track-meta">${t.steps.filter(s=>s.type==='lesson').length} lessons · ${t.steps.filter(s=>s.type==='quiz').length} quiz · ${t.steps.filter(s=>s.type==='practice').length} practice</div>
+        ${prog>0&&!done?`<div class="mini-prog"><div style="width:${pct}%"></div></div>`:''}
+      </div>
+      <div class="track-arrow">${done?'✓':'›'}</div>
+    </div>`;
+  }).join('');
+
+  app().innerHTML=topbar()+`<div class="wrap fade">
+    <div class="hero">
+      <div class="kicker">Chart Literacy · For Adults</div>
+      <h1>Learn to read charts<br>with structure, not stress.</h1>
+      <p>A step-by-step path from a single candle to institutional concepts — with real charts you practice on, not just theory.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="big">${doneSteps}/${totalSteps}</div><div class="lbl">Lessons done</div></div>
+      <div class="stat"><div class="big">${tracksDone}/${TRACKS.length}</div><div class="lbl">Tracks complete</div></div>
+      <div class="stat"><div class="big">${S.xp}</div><div class="lbl">Total XP</div></div>
+    </div>
+    <div class="sec-label">Your Curriculum</div>
+    <div class="track-grid">${cards}</div>
+    <p style="text-align:center;color:var(--dim);font-size:.78rem;margin-top:28px">Educational platform only. Not financial advice.</p>
+  </div>`;
+}
+
+function renderStep(){
+  const t=TRACKS[view.track];
+  const step=t.steps[view.step];
+  const total=t.steps.length;
+  const pct=Math.round((view.step)/total*100);
+  const dots=t.steps.map((s,i)=>`<div class="d ${i<view.step?'done':i===view.step?'cur':''}"></div>`).join('');
+
+  let inner='';
+  if(step.type==='lesson') inner=lessonHTML(t,step);
+  else if(step.type==='quiz') inner=quizHTML(t,step);
+  else if(step.type==='practice') inner=practiceHTML(t,step);
+
+  app().innerHTML=topbar()+`<div class="wrap fade">
+    <div class="lesson-top">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Tracks</button>
+      <div class="crumbs"><b>${t.name}</b> · ${view.step+1}/${total}</div>
+    </div>
+    <div class="prog-line"><div style="width:${pct}%"></div></div>
+    <div class="step-dots">${dots}</div>
+    ${inner}
+  </div>`;
+
+  // mount chart if present
+  if(step.chart){
+    requestAnimationFrame(()=>{
+      const cv=document.getElementById('chart');
+      if(cv){ view.activeChart=buildChart(cv,step.chart);
+        if(step.type==='practice') wireUpPractice(t,step); }
+    });
+  }
+}
+
+function lessonHTML(t,step){
+  const terms=step.terms?`<div class="term-row">${step.terms.map(([a,b])=>`<div class="term"><b>${a}</b> — ${b}</div>`).join('')}</div>`:'';
+  const after=step.afterTerms||'';
+  const concept=step.concept?`<div class="concept ${step.concept.warn?'warn':''}"><div class="ct">${step.concept.t}</div>${step.concept.body}</div>`:'';
+  const chart=step.chart?`<div class="chart-shell"><canvas id="chart"></canvas></div>${step.cap?`<div class="chart-cap">${step.cap}</div>`:''}`:'';
+  return `<div class="card">
+    <h2>${step.title}</h2>
+    <div class="lead">${step.lead||''}</div>
+    ${step.body||''}
+    ${terms}${after}
+    ${chart}
+    ${concept}
+    <div class="nav-row">
+      ${view.step>0?`<button class="btn btn-ghost btn-block" onclick="prevStep()">← Back</button>`:''}
+      <button class="btn btn-primary btn-block" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>`;
+}
+
+function quizHTML(t,step){
+  const opts=step.opts.map((o,i)=>{
+    let cls='';
+    if(view.answered){
+      if(i===step.answer) cls='correct';
+      else if(i===view.sel) cls='wrong';
+      cls+=' dis';
+    }
+    return `<div class="opt ${cls}" ${view.answered?'':`onclick="pickOpt(${i})"`}>
+      <span class="key">${String.fromCharCode(65+i)}</span>${o}</div>`;
+  }).join('');
+  const ok=view.answered&&view.sel===step.answer;
+  const explain=view.answered?`<div class="explain ${ok?'ok':'no'}">${ok?'✓ Correct. ':'✗ Not quite. '}${step.exp}</div>`:'';
+  return `<div class="quiz-box">
+    <div style="font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Quick Check</div>
+    <div class="quiz-q">${step.q}</div>
+    <div class="quiz-opts">${opts}</div>
+    ${explain}
+    ${view.answered?`<div class="nav-row"><button class="btn btn-primary btn-block" onclick="nextStep()">Continue →</button></div>`:''}
+  </div>`;
+}
+
+function practiceHTML(t,step){
+  let tools='';
+  if(step.tool==='hline'){
+    tools=`<div class="tool ${view.tool==='support'?'active':''}" onclick="setTool('support')"><span class="dot" style="background:#26A69A"></span>Support tool</div>`;
+  } else if(step.tool==='tline'){
+    tools=`<div class="tool ${view.tool==='trend'?'active':''}" onclick="setTool('trend')"><span class="dot" style="background:#F5B82E"></span>Trendline tool</div>`;
+  } else if(step.tool==='marks'){
+    tools=`<div class="tool ${view.tool==='HH'?'active':''}" onclick="setTool('HH')"><span class="dot" style="background:#26A69A"></span>HH</div>
+           <div class="tool ${view.tool==='HL'?'active':''}" onclick="setTool('HL')"><span class="dot" style="background:#5B8DEF"></span>HL</div>`;
+  } else if(step.tool==='icc'){
+    tools=`<div class="tool ${view.tool==='grab'?'active':''}" onclick="setTool('grab')"><span class="dot" style="background:#EF5350"></span>Grab (sweep)</div>
+           <div class="tool ${view.tool==='zone'?'active':''}" onclick="setTool('zone')"><span class="dot" style="background:#9B7BF0"></span>Zone</div>`;
+  } else if(step.tool==='level'){
+    tools=`<div class="tool ${view.tool==='level'?'active':''}" onclick="setTool('level')"><span class="dot" style="background:${step.toolColor||'#5B8DEF'}"></span>${step.toolLabel||'Level'}</div>`;
+  } else if(step.tool==='pointmark'){
+    tools=`<div class="tool ${view.tool==='point'?'active':''}" onclick="setTool('point')"><span class="dot" style="background:${step.toolColor||'#9B7BF0'}"></span>${step.toolLabel||'Mark'}</div>`;
+  }
+  return `<div class="card">
+    <div class="practice-head"><h2>${step.title}</h2></div>
+    <div class="task-card"><div class="tlabel">🎯 Your Task</div><div class="ttext">${step.task}</div></div>
+    <div class="tool-bar">${tools}<div class="tool" onclick="clearDrawings()">🗑️ Clear</div></div>
+    <div class="chart-shell"><canvas id="chart"></canvas></div>
+    <div class="chart-hint">💡 ${step.hint}</div>
+    <div class="feedback-banner" id="fb"></div>
+    <div class="practice-actions">
+      <button class="btn btn-green" id="checkBtn" onclick="checkPractice()">Check my answer</button>
+      <button class="btn btn-ghost" onclick="nextStep()" id="contBtn" style="display:none">Continue →</button>
+      <button class="btn btn-ghost btn-sm" onclick="nextStep()">Skip</button>
+    </div>
+  </div>`;
+}
+
+function renderComplete(){
+  const t=TRACKS[view.track];
+  app().innerHTML=topbar()+`<div class="wrap fade">
+    <div class="complete">
+      <div class="check">✓</div>
+      <h2>${t.name} complete!</h2>
+      <p>You finished all ${t.steps.length} steps of this track.</p>
+      <div class="reward">⚡ +${t.steps.length*15} XP earned</div>
+      <p style="font-size:.85rem">Total XP: ${S.xp}</p>
+      <div class="nav-row" style="max-width:340px;margin:24px auto 0">
+        <button class="btn btn-primary btn-block" onclick="goHome()">Back to Tracks →</button>
+      </div>
+    </div>
+  </div>`;
+  fireConfetti();
+}
+
+/* ════════════════════════════════════════════════════
+   PRACTICE INTERACTION
+════════════════════════════════════════════════════ */
+function wireUpPractice(t,step){
+  const ch=view.activeChart;
+  const cv=document.getElementById('chart');
+  if(!cv||!ch) return;
+  view.tool = step.tool==='hline'?'support'
+            : step.tool==='tline'?'trend'
+            : step.tool==='marks'?'HH'
+            : step.tool==='icc'?'grab'
+            : step.tool==='level'?'level'
+            : step.tool==='pointmark'?'point':null;
+  view.trendPts=[];
+  // re-render toolbar active state
+  let dragging=false;
+
+  function pos(e){
+    const r=cv.getBoundingClientRect();
+    const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    return {x:cx,y:cy};
+  }
+  function handle(e){
+    e.preventDefault();
+    const {x,y}=pos(e);
+    if(view.tool==='support'){
+      ch.userLines=[{type:'h',price:ch.priceAt(y),color:'#26A69A'}];
+    } else if(view.tool==='trend'){
+      view.trendPts.push({x,y});
+      if(view.trendPts.length>2) view.trendPts=[{x,y}];
+      if(view.trendPts.length===2){
+        ch.userLines=[{type:'t',x1:view.trendPts[0].x,y1:view.trendPts[0].y,x2:view.trendPts[1].x,y2:view.trendPts[1].y,color:'#F5B82E'}];
+      } else {
+        ch.userMarks=[{x,y,color:'#F5B82E',label:''}];
+      }
+    } else if(view.tool==='HH'||view.tool==='HL'){
+      // remove existing of same label then add
+      ch.userMarks=ch.userMarks.filter(m=>m.label!==view.tool);
+      ch.userMarks.push({x,y,color:view.tool==='HH'?'#26A69A':'#5B8DEF',label:view.tool,up:view.tool==='HH'});
+    } else if(view.tool==='grab'||view.tool==='zone'){
+      ch.userMarks=ch.userMarks.filter(m=>m.kind!==view.tool);
+      ch.userMarks.push({x,y,color:view.tool==='grab'?'#EF5350':'#9B7BF0',label:view.tool,kind:view.tool,up:view.tool==='grab'});
+      if(view.tool==='zone'){ ch.userLines=ch.userLines.filter(l=>l.kind!=='zone'); ch.userLines.push({type:'h',price:ch.priceAt(y),color:'#9B7BF0',kind:'zone'}); }
+    } else if(view.tool==='level'){
+      ch.userLines=[{type:'h',price:ch.priceAt(y),color:step.toolColor||'#5B8DEF'}];
+    } else if(view.tool==='point'){
+      ch.userMarks=[{x,y,color:step.toolColor||'#9B7BF0',label:step.toolLabel||'',up:true}];
+    }
+    ch.draw();
+  }
+  const drag=()=>view.tool==='support'||view.tool==='level';
+  cv.onmousedown=e=>{dragging=true;handle(e);};
+  cv.onmousemove=e=>{if(dragging&&drag())handle(e);};
+  cv.onmouseup=()=>dragging=false;
+  cv.ontouchstart=handle;
+  cv.ontouchmove=e=>{if(drag())handle(e);};
+}
+
+function setTool(tool){ view.tool=tool;
+  // update active classes without full redraw
+  document.querySelectorAll('.tool').forEach(el=>el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+function clearDrawings(){
+  const ch=view.activeChart; if(!ch)return;
+  ch.userLines=[]; ch.userMarks=[]; view.trendPts=[]; ch.draw();
+  const fb=document.getElementById('fb'); if(fb){fb.className='feedback-banner';fb.innerHTML='';}
+}
+
+function checkPractice(){
+  const t=TRACKS[view.track], step=t.steps[view.step], ch=view.activeChart;
+  const fb=document.getElementById('fb');
+  let ok=false, msg='';
+  const tol=(ch.max-ch.min)*0.06; // price tolerance
+
+  if(step.checkType==='supportLevel'){
+    const line=ch.userLines.find(l=>l.type==='h');
+    if(!line){ msg='Draw a support line first — select the Support tool and click on the chart.'; }
+    else if(Math.abs(line.price-ch.answerPrice)<=tol*1.4){ ok=true; msg='Nailed it. That\'s the level where buyers keep defending — every dip into it bounced.'; }
+    else { msg=`Close, but not quite at the support. Look lower — find where the candle lows line up (around ${ch.answerPrice.toFixed(0)}).`; }
+  }
+  else if(step.checkType==='uptrendLine'){
+    const line=ch.userLines.find(l=>l.type==='t');
+    if(!line){ msg='Draw a trendline — click the first swing low, then a later swing low.'; }
+    else {
+      const slopeUp=(line.y2-line.y1)/(line.x2-line.x1) < -0.05; // y inverted: up = negative slope
+      if(slopeUp){ ok=true; msg='Good. Your line rises under the swing lows — as long as price holds above it, the uptrend is intact.'; }
+      else { msg='Your line should rise to the right (connect a low to a HIGHER later low). Try again.'; }
+    }
+  }
+  else if(step.checkType==='structureLabels'){
+    const hh=ch.userMarks.find(m=>m.label==='HH');
+    const hl=ch.userMarks.find(m=>m.label==='HL');
+    if(!hh||!hl){ msg='Place at least one HH and one HL marker on the chart.'; }
+    else {
+      const hhOK=ch.answerPivots.some(p=>p.label==='HH'&&Math.abs(ch.xOf(p.i)-hh.x)<ch.cw*3 && hh.y<ch.plotH*0.6+ch.plotT+40);
+      const hlOK=ch.answerPivots.some(p=>p.label==='HL'&&Math.abs(ch.xOf(p.i)-hl.x)<ch.cw*3);
+      if(hh.y<hl.y){ ok=true; msg='Right structure. The peaks are your higher highs, the valleys your higher lows — textbook uptrend.'; }
+      else { msg='Check placement: HH belongs on a peak (higher up), HL on a valley (lower down). Your HH should sit above your HL.'; }
+    }
+  }
+  else if(step.checkType==='iccSetup'){
+    const grab=ch.userMarks.find(m=>m.kind==='grab');
+    const zone=ch.userMarks.find(m=>m.kind==='zone');
+    if(!grab||!zone){ msg='Mark both: the Grab (the sweep wick low) and the Zone (base of the displacement candle).'; }
+    else {
+      const grabX=ch.xOf(ch.answerGrab.i);
+      const grabOK=Math.abs(grab.x-grabX)<ch.cw*3 && ch.priceAt(grab.y)<ch.answerGrab.price+tol*2;
+      const zoneOK=zone.x>grabX; // zone after the grab
+      if(grabOK&&zoneOK){ ok=true; msg='That\'s the setup: liquidity swept below support (the grab), then displacement up. The zone is your entry on a pullback, stop below the grab.'; }
+      else if(!grabOK){ msg='The grab is the lowest wick that pierces support then snaps back — look for the deepest spike.'; }
+      else { msg='The zone should come AFTER the grab — it\'s the base of the big candle that displaced upward.'; }
+    }
+  }
+  else if(step.checkType==='levelNear'){
+    const line=ch.userLines.find(l=>l.type==='h');
+    if(!line){ msg=step.noDrawMsg||'Select the tool, then click on the chart to mark the level.'; }
+    else if(Math.abs(line.price-ch.answerPrice)<=tol*1.6){ ok=true; msg=step.okMsg||'Correct!'; }
+    else { msg=step.failMsg||'Not quite — look again at where the level sits.'; }
+  }
+  else if(step.checkType==='levelBelow'){
+    const line=ch.userLines.find(l=>l.type==='h');
+    const band=(ch.max-ch.min)*0.22;
+    if(!line){ msg=step.noDrawMsg||'Place your stop line on the chart.'; }
+    else if(line.price<ch.answerPrice && line.price>ch.answerPrice-band){ ok=true; msg=step.okMsg||'Good stop placement.'; }
+    else if(line.price>=ch.answerPrice){ msg=step.failMsg||'Your stop is too high — it should sit just BELOW the swing low.'; }
+    else { msg='That stop is very far away — tighten it to just below the structure for better risk:reward.'; }
+  }
+  else if(step.checkType==='markCandle'){
+    const m=ch.userMarks[ch.userMarks.length-1];
+    if(!m){ msg=step.noDrawMsg||'Click directly on the candle.'; }
+    else if(Math.abs(m.x-ch.xOf(ch.answerIndex))<ch.cw*2.2){ ok=true; msg=step.okMsg||'That\'s the one!'; }
+    else { msg=step.failMsg||'Not that candle — look again.'; }
+  }
+
+  if(fb){ fb.className='feedback-banner show '+(ok?'ok':'no'); fb.innerHTML=(ok?'✓ ':'')+msg; }
+  if(ok){
+    view.practiceDone=true;
+    document.getElementById('checkBtn').style.display='none';
+    document.getElementById('contBtn').style.display='inline-flex';
+    bumpXP(10);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   NAV / FLOW
+════════════════════════════════════════════════════ */
+function goHome(){ view.screen='home'; render(); window.scrollTo(0,0); }
+function openTrack(ti){
+  view.track=ti;
+  view.step=S.progress[TRACKS[ti].id]&&!S.completed[TRACKS[ti].id]?S.progress[TRACKS[ti].id]:0;
+  if(S.completed[TRACKS[ti].id]) view.step=0;
+  resetStepFlags();
+  view.screen='step'; render(); window.scrollTo(0,0);
+}
+function resetStepFlags(){ view.answered=false; view.sel=null; view.practiceDone=false; view.tool=null; view.trendPts=[]; }
+function pickOpt(i){
+  const t=TRACKS[view.track], step=t.steps[view.step];
+  view.sel=i; view.answered=true;
+  if(i===step.answer) bumpXP(10);
+  renderStep(); window.scrollTo(0,0);
+}
+function nextStep(){
+  const t=TRACKS[view.track];
+  // record progress
+  const reached=Math.max(S.progress[t.id]||0, view.step+1);
+  S.progress[t.id]=Math.min(reached,t.steps.length); persist();
+  if(view.step+1>=t.steps.length){
+    if(!S.completed[t.id]){ S.completed[t.id]=true; bumpXP(t.steps.length*15); }
+    S.completed[t.id]=true; persist();
+    view.screen='complete'; render(); window.scrollTo(0,0); return;
+  }
+  view.step++; resetStepFlags(); renderStep(); window.scrollTo(0,0);
+}
+function prevStep(){ if(view.step>0){view.step--;resetStepFlags();renderStep();window.scrollTo(0,0);} }
+function bumpXP(n){ S.xp+=n; persist();
+  document.querySelectorAll('.xp-pill').forEach(e=>e.innerHTML='⚡ '+S.xp+' XP');
+}
+
+/* ════════════════════════════════════════════════════
+   CONFETTI
+════════════════════════════════════════════════════ */
+const conf=document.getElementById('confetti'), cctx=conf.getContext('2d');
+let cps=[],cactive=false;
+function sizeConf(){conf.width=innerWidth;conf.height=innerHeight;}
+sizeConf();addEventListener('resize',()=>{sizeConf();});
+function fireConfetti(){
+  cactive=true;cps=[];
+  const cols=['#26A69A','#5B8DEF','#F5B82E','#9B7BF0','#EF5350','#fff'];
+  for(let i=0;i<120;i++)cps.push({x:Math.random()*conf.width,y:-20,vx:(Math.random()-.5)*6,vy:Math.random()*4+2,col:cols[~~(Math.random()*cols.length)],sz:Math.random()*8+4,rot:Math.random()*6,rs:(Math.random()-.5)*.3});
+  loopConf();setTimeout(()=>cactive=false,4000);
+}
+function loopConf(){
+  if(!cactive){cctx.clearRect(0,0,conf.width,conf.height);return;}
+  cctx.clearRect(0,0,conf.width,conf.height);
+  cps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.rot+=p.rs;
+    cctx.save();cctx.translate(p.x,p.y);cctx.rotate(p.rot);cctx.fillStyle=p.col;cctx.globalAlpha=Math.max(0,1-p.y/conf.height);
+    cctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);cctx.restore();});
+  cps=cps.filter(p=>p.y<conf.height+40);
+  requestAnimationFrame(loopConf);
+}
+
+/* boot */
+render();
+</script>
+</body>
+</html>
