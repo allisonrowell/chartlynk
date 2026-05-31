@@ -404,16 +404,30 @@ class Chart{
       c.lineWidth=2; c.strokeStyle='#fff'; c.strokeRect(x-bodyW/2, top, bodyW, bh);
       c.restore();
     };
+    const drawHalfWick=(cd,x,col,upper)=>{
+      const bodyTop=Math.min(this.yOf(cd.open),this.yOf(cd.close));
+      const bodyBot=Math.max(this.yOf(cd.open),this.yOf(cd.close));
+      c.save();
+      c.shadowColor=col; c.shadowBlur=16;
+      c.strokeStyle=col; c.lineWidth=2.6; c.lineCap='round';
+      if(upper){ c.beginPath(); c.moveTo(x,this.yOf(cd.high)); c.lineTo(x,bodyTop); c.stroke();
+        c.lineWidth=3.2; c.beginPath(); c.moveTo(x-7,this.yOf(cd.high)); c.lineTo(x+7,this.yOf(cd.high)); c.stroke(); }
+      else { c.beginPath(); c.moveTo(x,bodyBot); c.lineTo(x,this.yOf(cd.low)); c.stroke();
+        c.lineWidth=3.2; c.beginPath(); c.moveTo(x-7,this.yOf(cd.low)); c.lineTo(x+7,this.yOf(cd.low)); c.stroke(); }
+      c.restore();
+    };
     for(let i=0;i<this.candles.length;i++){
       const cd=this.candles[i], x=this.xOf(i);
       const up=cd.close>=cd.open, col=up?'#26A69A':'#EF5350';
       if(h==='body') drawBody(cd,x,col);
       else if(h==='wick') drawWick(cd,x,'#F5B82E');
+      else if(h==='upper') drawHalfWick(cd,x,'#FF7B78',true);
+      else if(h==='lower') drawHalfWick(cd,x,'#4DD0C4',false);
       else if(h==='green' && up){ drawWick(cd,x,'#26A69A'); drawBody(cd,x,'#26A69A'); }
       else if(h==='red' && !up){ drawWick(cd,x,'#EF5350'); drawBody(cd,x,'#EF5350'); }
     }
-    const labels={body:'BODY — the open-to-close range',wick:'WICK / SHADOW — the high & low extremes',green:'GREEN — close above open (bullish)',red:'RED — close below open (bearish)'};
-    const cols={body:'#fff',wick:'#F5B82E',green:'#4DD0C4',red:'#FF7B78'};
+    const labels={body:'BODY — the open-to-close range',wick:'WICK / SHADOW — the high & low extremes',green:'GREEN — close above open (bullish)',red:'RED — close below open (bearish)',upper:'UPPER WICK — sellers rejected higher prices',lower:'LOWER WICK — buyers rejected lower prices'};
+    const cols={body:'#fff',wick:'#F5B82E',green:'#4DD0C4',red:'#FF7B78',upper:'#FF7B78',lower:'#4DD0C4'};
     c.save();
     c.fillStyle=cols[h]||'#fff'; c.font='bold 12px Inter'; c.textAlign='center';
     c.fillText(labels[h]||'', this.w/2, this.plotT+4);
@@ -507,6 +521,8 @@ const TRACKS=[
        lead:'Wicks are where price got rejected.',
        body:`<p>A long <b>upper wick</b> means buyers pushed price up, but sellers slammed it back down before the close. That's selling pressure.</p>
        <p>A long <b>lower wick</b> means sellers pushed price down, but buyers bought it back up. That's buying pressure — often a sign of support.</p>`,
+       terms:[['Upper wick','sellers rejected higher prices'],['Lower wick','buyers rejected lower prices']],
+       interactive:'wicks',
        chart:'wicks',
        cap:'Long lower wicks (left) show buyers defending. Long upper wicks (right) show sellers capping.',
        concept:{t:'Trader tip',body:'A candle with a tiny body and long wicks on both sides is a "doji" — indecision. The market is undecided.'}
@@ -1661,8 +1677,9 @@ function renderStep(){
 
 function lessonHTML(t,step){
   let terms='';
-  if(step.terms && step.interactive==='anatomy'){
-    const keys=['body','wick','green','red'];
+  const keyMap={anatomy:['body','wick','green','red'],wicks:['upper','lower']};
+  if(step.terms && keyMap[step.interactive]){
+    const keys=keyMap[step.interactive];
     terms=`<div class="term-row">${step.terms.map(([a,b],i)=>`<button class="term term-btn" data-anat="${keys[i]}" onclick="anatomyClick('${keys[i]}',this)"><b>${a}</b> — ${b}</button>`).join('')}</div><div class="anatomy-hint">👆 Tap each part to light it up on the chart below</div>`;
   } else if(step.terms){
     terms=`<div class="term-row">${step.terms.map(([a,b])=>`<div class="term"><b>${a}</b> — ${b}</div>`).join('')}</div>`;
