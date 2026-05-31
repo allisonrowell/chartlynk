@@ -373,10 +373,21 @@ class Chart{
       else if(o.type==='pivot') this._drawPivot(o);
     }
     // user drawings
+    if(this.userZones) for(const z of this.userZones) this._drawUserZone(z);
     for(const l of this.userLines) this._drawUserLine(l);
     for(const m of this.userMarks) this._drawUserMark(m);
     // interactive anatomy spotlight
     if(this.highlight) this._spotlight();
+  }
+  _drawUserZone(z){
+    const c=this.ctx;
+    const y1=this.yOf(z.priceHigh), y2=this.yOf(z.priceLow);
+    c.save();
+    c.fillStyle=(z.color||'#9B7BF0')+'33';
+    c.fillRect(this.plotL,Math.min(y1,y2),this.plotW,Math.abs(y2-y1));
+    c.strokeStyle=z.color||'#9B7BF0'; c.lineWidth=1.5; c.setLineDash([4,3]);
+    c.strokeRect(this.plotL,Math.min(y1,y2),this.plotW,Math.abs(y2-y1));
+    c.setLineDash([]); c.restore();
   }
 
   _spotlight(){
@@ -1665,6 +1676,7 @@ function render(){
   if(view.screen==='home') renderHome();
   else if(view.screen==='step') renderStep();
   else if(view.screen==='complete') renderComplete();
+  else if(view.screen==='sandbox') renderSandbox();
 }
 
 function topbar(){
@@ -1714,10 +1726,135 @@ function renderHome(){
       <div class="stat"><div class="big">${tracksDone}/${TRACKS.length}</div><div class="lbl">Tracks complete</div></div>
       <div class="stat"><div class="big">${S.xp}</div><div class="lbl">Total XP</div></div>
     </div>
+    <div class="sec-label">Practice</div>
+    <div class="track-card" onclick="openSandbox()" style="border-color:rgba(245,184,46,.3)">
+      <div class="track-num" style="background:#F5B82E18;border:1.5px solid #F5B82E40">🎨</div>
+      <div class="track-info">
+        <div class="track-name">Freeform Sandbox <span class="pill pill-prog">Free play</span></div>
+        <div class="track-desc">Load a random chart and draw anything — lines, trendlines, zones, markers. No grading, just practice.</div>
+      </div>
+      <div class="track-arrow">›</div>
+    </div>
     <div class="sec-label">Your Curriculum</div>
     <div class="track-grid">${cards}</div>
     <p style="text-align:center;color:var(--dim);font-size:.78rem;margin-top:28px">Educational platform only. Not financial advice.</p>
   </div>`;
+}
+
+/* ════════════════════════════════════════════════════
+   FREEFORM SANDBOX
+════════════════════════════════════════════════════ */
+let sandbox={seed:1, tool:'support', chart:null, trendPts:[], history:[]};
+const SANDBOX_TOOLS=[
+  {k:'support',  label:'Support',    color:'#26A69A', kind:'hline'},
+  {k:'resistance',label:'Resistance',color:'#EF5350', kind:'hline'},
+  {k:'trend',    label:'Trendline',  color:'#F5B82E', kind:'tline'},
+  {k:'zone',     label:'Zone',       color:'#9B7BF0', kind:'zone'},
+  {k:'mark',     label:'Marker',     color:'#3D9BFF', kind:'point'},
+];
+function openSandbox(){ sandbox.seed=(Date.now? (Date.now()%100000) : (sandbox.seed+7)); view.screen='sandbox'; render(); window.scrollTo(0,0); }
+function sandboxNewChart(){ sandbox.seed=(sandbox.seed*16807+12345)%2147483647; renderSandbox(); window.scrollTo(0,0); }
+function sandboxTool(k){ sandbox.tool=k; sandbox.trendPts=[]; document.querySelectorAll('.tool[data-sbtool]').forEach(el=>el.classList.toggle('active', el.dataset.sbtool===k)); }
+function sandboxClear(){ const ch=sandbox.chart; if(!ch)return; ch.userLines=[]; ch.userMarks=[]; ch.userZones=[]; sandbox.trendPts=[]; ch.draw(); }
+function sandboxUndo(){ const ch=sandbox.chart; if(!ch)return;
+  // pop most recent across all draw arrays by timestamp
+  const all=[...(ch.userLines||[]).map(o=>['line',o]),...(ch.userMarks||[]).map(o=>['mark',o]),...(ch.userZones||[]).map(o=>['zone',o])];
+  if(!all.length) return;
+  all.sort((a,b)=>(b[1]._t||0)-(a[1]._t||0));
+  const [kind,obj]=all[0];
+  if(kind==='line') ch.userLines=ch.userLines.filter(o=>o!==obj);
+  else if(kind==='mark') ch.userMarks=ch.userMarks.filter(o=>o!==obj);
+  else if(kind==='zone') ch.userZones=ch.userZones.filter(o=>o!==obj);
+  sandbox.trendPts=[]; ch.draw();
+}
+
+function renderSandbox(){
+  const tools=SANDBOX_TOOLS.map(t=>
+    `<div class="tool ${sandbox.tool===t.k?'active':''}" data-sbtool="${t.k}" onclick="sandboxTool('${t.k}')"><span class="dot" style="background:${t.color}"></span>${t.label}</div>`
+  ).join('');
+  app().innerHTML=topbar()+`<div class="wrap fade">
+    <div class="lesson-top">
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Tracks</button>
+      <div class="crumbs"><b>🎨 Freeform Sandbox</b></div>
+    </div>
+    <div class="task-card" style="border-color:rgba(245,184,46,.25)">
+      <div class="tlabel">🎨 Free play</div>
+      <div class="ttext">Pick a tool, then draw on the chart. Lines & zones snap to where you tap; trendlines take two taps. No grading — analyze it however you like, then load a new chart.</div>
+    </div>
+    <div class="tool-bar">${tools}</div>
+    <div class="tool-bar">
+      <div class="tool" onclick="sandboxUndo()">↩️ Undo</div>
+      <div class="tool" onclick="sandboxClear()">🗑️ Clear</div>
+      <div class="tool" onclick="sandboxNewChart()" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">🔀 New chart</div>
+    </div>
+    <div class="chart-shell"><canvas id="chart"></canvas></div>
+    <div class="chart-hint">💡 Tip: tap a tool, then tap the chart. Trendline = two taps. Drag a line to fine-tune it.</div>
+  </div>`;
+
+  requestAnimationFrame(()=>{
+    const cv=document.getElementById('chart');
+    if(!cv) return;
+    // generate a varied random chart from the seed
+    const r=mulberry32(sandbox.seed);
+    const shape=Math.floor(r()*4); // 0 up, 1 down, 2 range, 3 wavy
+    let opts={vol:1.6,start:90+r()*30};
+    if(shape===0) opts.drift=0.5;
+    else if(shape===1) opts.drift=-0.5;
+    else if(shape===2) opts.drift=0;
+    else { opts.drift=0; opts.wave={period:6+r()*5, amp:1.5}; }
+    const candles=genCandles(sandbox.seed, 34, opts);
+    const ch=new Chart(cv,candles,{height:360,padR:56});
+    ch.userZones=[];
+    sandbox.chart=ch; ch.draw();
+    wireUpSandbox(cv);
+    // refresh active tool state
+    document.querySelectorAll('.tool[data-sbtool]').forEach(el=>el.classList.toggle('active', el.dataset.sbtool===sandbox.tool));
+  });
+}
+
+function wireUpSandbox(cv){
+  const ch=sandbox.chart;
+  let dragging=false, dragObj=null;
+  const T=()=> (typeof performance!=='undefined'&&performance.now)?performance.now():(sandbox._tick=(sandbox._tick||0)+1);
+  const toolDef=()=>SANDBOX_TOOLS.find(t=>t.k===sandbox.tool)||SANDBOX_TOOLS[0];
+  function pos(e){ const rc=cv.getBoundingClientRect();
+    return {x:(e.touches?e.touches[0].clientX:e.clientX)-rc.left, y:(e.touches?e.touches[0].clientY:e.clientY)-rc.top}; }
+  function place(e){
+    e.preventDefault();
+    const {x,y}=pos(e); const td=toolDef();
+    if(td.kind==='hline'){
+      const o={type:'h',price:ch.priceAt(y),color:td.color,_t:T()};
+      ch.userLines.push(o); dragObj=o;
+    } else if(td.kind==='tline'){
+      sandbox.trendPts.push({x,y});
+      if(sandbox.trendPts.length===2){
+        ch.userLines.push({type:'t',x1:sandbox.trendPts[0].x,y1:sandbox.trendPts[0].y,x2:x,y2:y,color:td.color,_t:T()});
+        sandbox.trendPts=[];
+        ch.userMarks=ch.userMarks.filter(m=>!m._tmp);
+      } else {
+        ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()});
+      }
+    } else if(td.kind==='zone'){
+      sandbox.trendPts.push({x,y});
+      if(sandbox.trendPts.length===2){
+        ch.userZones.push({priceHigh:ch.priceAt(Math.min(sandbox.trendPts[0].y,y)),priceLow:ch.priceAt(Math.max(sandbox.trendPts[0].y,y)),color:td.color,_t:T()});
+        sandbox.trendPts=[];
+        ch.userMarks=ch.userMarks.filter(m=>!m._tmp);
+      } else {
+        ch.userMarks.push({x,y,color:td.color,label:'',_tmp:true,_t:T()});
+      }
+    } else if(td.kind==='point'){
+      ch.userMarks.push({x,y,color:td.color,label:'',_t:T()});
+    }
+    ch.draw();
+  }
+  const isDragTool=()=>{const k=toolDef().kind; return k==='hline';};
+  cv.onmousedown=e=>{dragging=true;place(e);};
+  cv.onmousemove=e=>{ if(dragging&&isDragTool()&&dragObj){ dragObj.price=ch.priceAt(pos(e).y); ch.draw(); } };
+  cv.onmouseup=()=>{dragging=false;dragObj=null;};
+  cv.ontouchstart=place;
+  cv.ontouchmove=e=>{ if(isDragTool()&&dragObj){ dragObj.price=ch.priceAt(pos(e).y); ch.draw(); } };
+  cv.ontouchend=()=>{dragObj=null;};
 }
 
 function renderStep(){
